@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!-- =====================================================================
+     PROJECTS.HTML - choose a project (like choosing a stage)
+     The projects are NOT written here: they come from modules/projects/projects-data.js
+     projects.js copies the two <template>s below once for every project:
+       - "list-item-template" = one line in the list on the left
+       - "preview-template"   = one big preview on the right
+     So to change how a line or a preview LOOKS, edit the template here.
+     To add / change a PROJECT, edit projects-data.js.
+     ===================================================================== -->
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Projects - Diyana Nadra</title>
+
+        <!-- fonts: Cinzel (big titles), Pixelify Sans (game buttons), Georgia (normal text, already on every computer) -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Pixelify+Sans:wght@400;600&display=swap">
+
+        <!-- icons (fa-github, fa-sun, fa-moon...) -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+        <!-- shared look first, then this page's own look -->
+        <link rel="stylesheet" href="modules/shared/shared.css">
+        <link rel="stylesheet" href="modules/projects/projects.css">
+
+        <script>
+            /*tells the CSS that JavaScript is on (the typewriter needs it)*/
+            document.documentElement.classList.add('js');
+
+            /*Light and Dark Mode (part 1): pick the theme BEFORE the page shows, so it never flashes*/
+            try {
+                var savedTheme = localStorage.getItem('theme');
+
+                if (savedTheme) {
+                    /*user picked a theme before -> use it*/
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    /*first visit -> follow the phone/laptop setting*/
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {
+            }
+        </script>
+    </head>
+
+    <body>
+
+        <main class="screen">
+
+            <!-- top bar: back button · title · light/dark switch (modules/shared/topBar.html) -->
+            <div data-include="modules/shared/topBar.html" data-back-link="index.html" data-back-text="Menu" data-title="PROJECTS"></div>
+
+            <div class="stage-select">
+
+                <!-- ================= LEFT: LIST (mouse or ↑ ↓ to choose, Enter or click to open) ================= -->
+                <nav class="panel project-list slide-up" aria-label="Projects">
+                    <p class="label">SELECT A PROJECT</p>
+                    <!-- projects.js puts one list-item-template here for each project -->
+                    <ul class="choice-list" id="project-list"></ul>
+                </nav>
+
+                <!-- ================= RIGHT: BIG PREVIEW (only the chosen one is shown) ================= -->
+                <!-- projects.js puts one preview-template here for each project -->
+                <div class="previews slide-up" style="--delay:1" id="previews"></div>
+
+            </div>
+
+        </main>
+
+
+        <!-- ================= TEMPLATE: ONE LINE IN THE LIST =================
+             (not shown by itself; projects.js fills the parts marked data-fill) -->
+        <template id="list-item-template">
+            <li>
+                <a href="#" class="choice project-choice" data-fill="link">
+                    <span class="choice-arrow" aria-hidden="true">▶</span>
+                    <span class="project-thumb" data-fill="thumb-box" aria-hidden="true"><img src="" alt="" data-fill="thumb"></span>
+                    <span class="project-choice-text">
+                        <span class="project-choice-name" data-fill="name"></span>
+                        <span class="project-choice-type" data-fill="type"></span>
+                    </span>
+                </a>
+            </li>
+        </template>
+
+
+        <!-- ================= TEMPLATE: ONE BIG PREVIEW ================= -->
+        <template id="preview-template">
+            <section class="preview" hidden>
+
+                <div class="frame">
+                    <span class="stud stud-tl" aria-hidden="true"></span>
+                    <span class="stud stud-tr" aria-hidden="true"></span>
+                    <span class="stud stud-bl" aria-hidden="true"></span>
+                    <span class="stud stud-br" aria-hidden="true"></span>
+                    <p class="plate">◆ <span data-fill="name"></span> ◆</p>
+                    <div class="frame-screen" data-fill="picture-box">
+                        <img src="" alt="" data-fill="picture">
+                    </div>
+                </div>
+
+                <div class="panel preview-info">
+                    <div class="preview-text">
+                        <p class="label" data-fill="type"></p>
+                        <ul class="tags" data-fill="tags"></ul>
+                    </div>
+                    <a href="#" class="btn" data-fill="link">
+                        Open project <i class="fa-solid fa-caret-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+
+            </section>
+        </template>
+
+        <!-- 1. puts the top bar / switch into the page   2. switch, menus, typewriter -->
+        <script src="modules/shared/include.js"></script>
+        <script src="modules/shared/shared.js"></script>
+        <!-- 3. the list of projects   4. builds this page from that list -->
+        <script src="modules/projects/projects-data.js"></script>
+        <script src="modules/projects/projects.js"></script>
+
+    </body>
+</html>

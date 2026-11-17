@@ -1,0 +1,284 @@
+/* =====================================================================
+   projects.css - only for projects.html
+   ===================================================================== */
+
+
+/* ===================== SCREEN 1: CHOOSE A PROJECT ===================== */
+
+/*list on the left, big preview on the right*/
+.stage-select {
+    flex-grow:1;
+    display:flex;
+    align-items:flex-start;
+    gap:40px;
+}
+
+/* ----- LEFT: list ----- */
+.project-list {
+    width:380px;
+    flex-shrink:0;
+    max-height:600px;
+    overflow-y:auto;        /*many projects -> the list scrolls, nothing gets cut*/
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.project-list ul {
+    list-style:none;
+    margin:0;
+    padding:6px 4px;        /*room for the glow*/
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.project-choice {
+    min-height:72px;
+    padding:8px 12px;
+}
+
+/*small picture in the list*/
+.project-thumb {
+    width:72px;
+    height:48px;
+    flex-shrink:0;
+    overflow:hidden;
+    background:#111111;
+    border:2px solid currentColor;
+}
+
+.project-thumb img {
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.project-thumb.missing::after {
+    content:"";             /*too small for words, just grey*/
+}
+
+.project-choice-text {
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+
+.project-choice-name {
+    font-family:var(--font-title);
+    font-size:19px;
+    font-weight:600;
+}
+
+.project-choice-type {
+    font-size:13px;
+}
+
+/* ----- RIGHT: preview ----- */
+.previews {
+    flex-grow:1;
+    min-width:0;
+    padding-top:12px;       /*room for the name plate*/
+}
+
+.preview {
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+    animation:slideUp 0.2s ease-out both; /*slides up every time it changes*/
+}
+
+.preview[hidden] {
+    display:none;
+}
+
+.preview-info {
+    padding:18px 22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:18px 24px;
+}
+
+.preview-text {
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+
+/* ===================== SCREEN 2: ONE PROJECT OPENED ===================== */
+
+.project-open {
+    flex-grow:1;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+/* ----- screenshots: < frame > ----- */
+.shots {
+    display:flex;
+    align-items:center;
+    gap:24px;
+    padding-top:12px;       /*room for the name plate*/
+    outline:none;
+}
+
+.shots-frame {
+    flex-grow:1;
+    min-width:0;
+}
+
+#shot-window {
+    touch-action:pan-y;     /*lets the page scroll up/down while swiping left/right*/
+    cursor:grab;
+}
+
+/*all screenshots in one row; projects.js slides it left/right*/
+.shot-track {
+    display:flex;
+    height:100%;
+    transition:transform 0.2s ease-out;
+}
+
+.shot {
+    flex:0 0 100%;
+    height:100%;
+}
+
+.shot img {
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    pointer-events:none;    /*so dragging swipes instead of dragging the picture*/
+}
+
+/* ----- dots ----- */
+.shot-dots {
+    display:flex;
+    justify-content:center;
+    gap:4px;
+}
+
+.shot-dot {
+    width:40px;
+    height:40px;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    background:transparent;
+    border:0;
+}
+
+.shot-dot span {
+    width:14px;
+    height:14px;
+    border:3px solid var(--ghost-edge);
+    transition:background 0.2s, transform 0.2s;
+}
+
+.shot-dot:hover span {
+    transform:translateY(-3px);
+}
+
+.shot-dot.on span {
+    background:var(--choice);
+}
+
+/* ----- description: portrait + dialogue ----- */
+.project-talk {
+    display:flex;
+    align-items:flex-end;
+    gap:22px;
+}
+
+.talk-portrait {
+    width:116px;
+    height:140px;
+    flex-shrink:0;
+    padding:5px;
+    background:#300000;
+    box-shadow:0 0 0 3px var(--gold), 5px 5px 0 3px var(--ghost-edge);
+}
+
+[data-theme="dark"] .talk-portrait {
+    background:#cc0000;
+}
+
+.talk-portrait img {
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 25%;
+    background:#ffffff;
+}
+
+.talk-box {
+    flex-grow:1;
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:26px;
+}
+
+.talk-box .typewriter {
+    flex-grow:1;
+    font-size:17px;
+}
+
+.talk-link {
+    flex-shrink:0;
+}
+
+
+/* ===================== PHONE / SMALL SCREEN ===================== */
+
+@media (max-width: 900px) {
+
+    /*list on top, preview below*/
+    .stage-select {
+        flex-direction:column;
+        align-items:stretch;
+        gap:28px;
+    }
+
+    .project-list {
+        width:100%;
+        max-height:none;
+    }
+
+    /*arrows go under the screenshot*/
+    .shots {
+        flex-wrap:wrap;
+        justify-content:center;
+        gap:16px;
+    }
+
+    .shots-frame {
+        flex-basis:100%;
+        order:-1;
+    }
+
+    /*portrait above the dialogue*/
+    .project-talk {
+        flex-direction:column;
+        align-items:flex-start;
+        gap:28px;
+    }
+
+    .talk-box {
+        width:100%;
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}

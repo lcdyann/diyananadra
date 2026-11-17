@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!-- ===== ABOUT.HTML - "Start" in the menu: my character sheet ===== -->
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>About Me - Diyana Nadra</title>
+
+        <!-- fonts: Cinzel (big titles), Pixelify Sans (game buttons), Georgia (normal text, already on every computer) -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Pixelify+Sans:wght@400;600&display=swap">
+
+        <!-- icons (fa-github, fa-sun, fa-moon...) -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+        <!-- shared look first, then this page's own look -->
+        <link rel="stylesheet" href="modules/shared/shared.css">
+        <link rel="stylesheet" href="modules/about/about.css">
+
+        <script>
+            /*tells the CSS that JavaScript is on (the typewriter needs it)*/
+            document.documentElement.classList.add('js');
+
+            /*Light and Dark Mode (part 1): pick the theme BEFORE the page shows, so it never flashes*/
+            try {
+                var savedTheme = localStorage.getItem('theme');
+
+                if (savedTheme) {
+                    /*user picked a theme before -> use it*/
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    /*first visit -> follow the phone/laptop setting*/
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {
+            }
+        </script>
+    </head>
+
+    <body>
+
+        <main class="screen">
+
+            <!-- top bar: back button · title · light/dark switch (modules/shared/topBar.html) -->
+            <div data-include="modules/shared/topBar.html" data-back-link="index.html" data-back-text="Menu" data-title="ABOUT ME"></div>
+
+            <div class="sheet">
+
+                <!-- ================= LEFT: CHARACTER + STAT BARS ================= -->
+                <aside class="sheet-left slide-up">
+
+                    <div class="portrait">
+                        <img src="assets/me.png" alt="Diyana Nadra">
+                    </div>
+
+                    <!-- STAT BARS: change the % in style="width:...%" -->
+                    <div class="panel stats">
+                        <div class="stat">
+                            <span class="stat-name">Frontend</span>
+                            <span class="stat-bar"><span class="stat-fill" style="width:80%"></span></span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-name">Backend</span>
+                            <span class="stat-bar"><span class="stat-fill" style="width:65%"></span></span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-name">Game design</span>
+                            <span class="stat-bar"><span class="stat-fill" style="width:70%"></span></span>
+                        </div>
+                    </div>
+
+                </aside>
+
+
+                <!-- ================= RIGHT: NAME, INTRO, EDUCATION, SKILLS, RESUME ================= -->
+                <section class="sheet-right slide-up" style="--delay:1">
+
+                    <header>
+                        <h2 class="sheet-name">DIYANA NADRA</h2>
+                        <p class="sheet-role">Final Year Software Engineering Student</p>
+                    </header>
+
+                    <!-- INTRO as a dialogue box: the text types itself (shared.js). Change the text inside tw-full. -->
+                    <div class="dialog">
+                        <span class="dialog-name">Diyana</span>
+                        <button type="button" class="typewriter" aria-label="Show the whole intro">
+                            <span class="tw-full">Hi, traveller! I'm Diyana. [Write 2–3 sentences here: who you are, what you love building, and what you are looking for.]</span>
+                            <span class="tw-shown" aria-hidden="true"></span>
+                        </button>
+                        <span class="dialog-next" aria-hidden="true">▼</span>
+                    </div>
+
+                    <!-- EDUCATION -->
+                    <div class="panel education">
+                        <p class="label">EDUCATION</p>
+                        <p class="education-text">Bachelor of Software Engineering · [YOUR UNIVERSITY] · [YEARS]</p>
+                    </div>
+
+                    <!-- SKILLS: one box per group. To add a skill, add an <li>. To add a group, copy a whole skill-group div. -->
+                    <div class="skill-groups">
+
+                        <div class="panel skill-group">
+                            <p class="label">FRONTEND</p>
+                            <ul class="tags">
+                                <li>HTML</li>
+                                <li>CSS</li>
+                                <li>JavaScript</li>
+                            </ul>
+                        </div>
+
+                        <div class="panel skill-group">
+                            <p class="label">BACKEND</p>
+                            <ul class="tags">
+                                <li>PHP</li>
+                            </ul>
+                        </div>
+
+                        <div class="panel skill-group">
+                            <p class="label">DATABASE &amp; TOOLS</p>
+                            <ul class="tags">
+                                <li>MySQL</li>
+                                <li>Git</li>
+                                <li>GitHub</li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                    <!-- RESUME: put your PDF at assets/resume/Diyana-Nadra-Resume.pdf -->
+                    <div class="resume-row">
+                        <a href="assets/resume/Diyana-Nadra-Resume.pdf" target="_blank" rel="noopener" class="btn btn-big">
+                            <i class="fa-solid fa-scroll wiggle" aria-hidden="true"></i>
+                            Open my Resume scroll
+                        </a>
+                        <p class="resume-note">+1 PDF unlocked</p>
+                    </div>
+
+                </section>
+
+            </div>
+
+        </main>
+
+        <!-- 1. puts the top bar / switch into the page   2. switch, menus, typewriter -->
+        <script src="modules/shared/include.js"></script>
+        <script src="modules/shared/shared.js"></script>
+
+    </body>
+</html>

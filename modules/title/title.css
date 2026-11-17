@@ -1,0 +1,277 @@
+/* =====================================================================
+   title.css - only for index.html (the title screen)
+   ===================================================================== */
+
+
+/* ===================== SCREEN ===================== */
+
+.title-screen {
+    position:relative;
+    min-height:100vh;
+    overflow:hidden;
+    padding:28px 80px 40px;
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+}
+
+/*everything on top of the background*/
+.title-mode,
+.title-main,
+.title-bottom {
+    position:relative;
+    z-index:2;
+}
+
+
+/* ===================== BACKGROUND ===================== */
+
+/* ----- drawn beach (placeholder) ----- */
+.title-scene {
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:#f4efe6;
+}
+
+.scene-sun {
+    position:absolute;
+    right:14%;
+    top:12%;
+    width:220px;
+    height:220px;
+    border-radius:50%;
+    background:#eac231;
+    box-shadow:0 0 80px rgba(234, 194, 49, 0.6);
+}
+
+.scene-sea {
+    position:absolute;
+    left:0;
+    right:0;
+    top:54%;
+    height:21%;
+    background:#5EC4CD;
+    border-top:6px solid #ffffff;
+}
+
+.scene-sand {
+    position:absolute;
+    left:0;
+    right:0;
+    top:75%;
+    bottom:0;
+    background:#E6DFD3;
+}
+
+/*dark mode: red moon over a dark sea*/
+[data-theme="dark"] .title-scene { background:#120606; }
+[data-theme="dark"] .scene-sun   { background:#cc0000; box-shadow:0 0 80px rgba(204, 0, 0, 0.6); }
+[data-theme="dark"] .scene-sea   { background:#2a0505; border-top-color:#095B43; }
+[data-theme="dark"] .scene-sand  { background:#0b0303; }
+
+/* ----- YOUR picture (covers the drawn beach when the file exists) ----- */
+.title-bg {
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background-image:url('../../assets/bg/title-light.png');
+    background-size:cover;
+    background-position:center;
+}
+
+[data-theme="dark"] .title-bg {
+    background-image:url('../../assets/bg/title-dark.png');
+}
+
+
+/* ===================== TOP RIGHT: SWITCH ===================== */
+
+.title-mode {
+    align-self:flex-end;
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+
+/* ===================== MIDDLE: TITLE + MENU + CHARACTER ===================== */
+
+.title-main {
+    flex-grow:1;
+    width:100%;
+    max-width:1120px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:48px;
+}
+
+.title-left {
+    display:flex;
+    flex-direction:column;
+    gap:34px;
+}
+
+.game-title {
+    margin:0;
+    font-family:var(--font-title);
+    font-weight:800;
+    font-size:clamp(3rem, 7vw, 4.75rem);
+    line-height:0.95;
+    letter-spacing:4px;
+    color:var(--title);
+    text-shadow:4px 4px 0 #ffffff;
+}
+
+[data-theme="dark"] .game-title {
+    color:var(--fg);
+    text-shadow:4px 4px 0 #8A0303;
+}
+
+.game-subtitle {
+    margin:10px 0 0 0;
+    font-size:20px;
+    font-style:italic;
+}
+
+.title-menu {
+    width:320px;
+    padding:18px;
+}
+
+.title-menu ul {
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.title-hint {
+    margin:0;
+    font-family:var(--font-pixel);
+    font-size:15px;
+}
+
+
+/* ----- CHARACTER (your photo) ----- */
+
+.character {
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+/*floats up and down slowly (on the frame, so it doesn't fight the slide-up)*/
+.character-frame {
+    width:clamp(220px, 24vw, 300px);
+    aspect-ratio:300 / 380;
+    padding:8px;
+    background:#300000;
+    box-shadow:0 0 0 4px #ffffff, 10px 10px 0 4px #18949f, 0 0 60px rgba(94, 196, 205, 0.7);
+    animation:float 3s ease-in-out infinite;
+}
+
+[data-theme="dark"] .character-frame {
+    background:#cc0000;
+    box-shadow:0 0 0 4px #550000, 10px 10px 0 4px #550000, 0 0 60px rgba(204, 0, 0, 0.6);
+}
+
+.character-frame img {
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 30%;
+    background:#ffffff;
+}
+
+/*name plate under the photo*/
+.character-plate {
+    position:relative;
+    margin:-14px 0 0 0;
+    padding:8px 20px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:var(--font-pixel);
+    font-size:18px;
+}
+
+.character-level {
+    font-weight:600;
+    color:var(--title);
+}
+
+@keyframes float {
+    50% { transform:translateY(-8px); }
+}
+
+
+/* ===================== BOTTOM: SOCIALS + COPYRIGHT ===================== */
+
+.title-bottom {
+    width:100%;
+    max-width:1120px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+}
+
+.socials {
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    gap:16px;
+}
+
+.copyright {
+    margin:0;
+    padding:6px 12px;
+    font-family:var(--font-pixel);
+    font-size:15px;
+}
+
+
+/* ===================== PHONE / SMALL SCREEN ===================== */
+
+@media (max-width: 900px) {
+
+    .title-screen {
+        padding:20px 16px 28px;
+    }
+
+    /*character on top, title + menu below*/
+    .title-main {
+        flex-direction:column-reverse;
+        justify-content:center;
+        gap:32px;
+    }
+
+    .title-left {
+        width:100%;
+        align-items:center;
+        text-align:center;
+        gap:24px;
+    }
+
+    .title-menu {
+        width:100%;
+        max-width:340px;
+    }
+
+    .title-hint {
+        display:none; /*no keyboard on phones*/
+    }
+
+    .title-bottom {
+        flex-direction:column;
+    }
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<!-- =====================================================================
+     PROJECT.HTML - one project opened, e.g. project.html?p=sejarahwira
+     The words and pictures come from modules/projects/projects-data.js
+     projects.js fills every part marked with an id or data-fill.
+     To change how the page LOOKS, edit it here. To change a PROJECT, edit projects-data.js.
+     ===================================================================== -->
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Project - Diyana Nadra</title>
+
+        <!-- fonts: Cinzel (big titles), Pixelify Sans (game buttons), Georgia (normal text, already on every computer) -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Pixelify+Sans:wght@400;600&display=swap">
+
+        <!-- icons (fa-github, fa-sun, fa-moon...) -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+        <!-- shared look first, then this page's own look -->
+        <link rel="stylesheet" href="modules/shared/shared.css">
+        <link rel="stylesheet" href="modules/projects/projects.css">
+
+        <script>
+            /*tells the CSS that JavaScript is on (the typewriter needs it)*/
+            document.documentElement.classList.add('js');
+
+            /*Light and Dark Mode (part 1): pick the theme BEFORE the page shows, so it never flashes*/
+            try {
+                var savedTheme = localStorage.getItem('theme');
+
+                if (savedTheme) {
+                    /*user picked a theme before -> use it*/
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    /*first visit -> follow the phone/laptop setting*/
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {
+            }
+        </script>
+    </head>
+
+    <body>
+
+        <main class="screen">
+
+            <!-- top bar: back button · title · light/dark switch (modules/shared/topBar.html)
+                 projects.js changes data-title to the project's name -->
+            <div data-include="modules/shared/topBar.html" data-back-link="projects.html" data-back-text="All projects" data-title="PROJECT" id="project-top-bar"></div>
+
+            <div class="project-open">
+
+                <!-- ================= SCREENSHOTS in the game frame: < picture > ================= -->
+                <section class="shots slide-up" id="shots" tabindex="0" aria-label="Screenshots, use the left and right arrow keys">
+
+                    <button type="button" class="btn btn-ghost btn-square" id="shot-prev" aria-label="Previous screenshot">
+                        <i class="fa-solid fa-caret-left" aria-hidden="true"></i>
+                    </button>
+
+                    <div class="frame shots-frame">
+                        <span class="stud stud-tl" aria-hidden="true"></span>
+                        <span class="stud stud-tr" aria-hidden="true"></span>
+                        <span class="stud stud-bl" aria-hidden="true"></span>
+                        <span class="stud stud-br" aria-hidden="true"></span>
+                        <!-- plate: the screenshot's name + number -->
+                        <p class="plate" aria-live="polite">◆ <span id="shot-name"></span> · <span id="shot-count"></span> ◆</p>
+
+                        <div class="frame-screen" id="shot-window">
+                            <!-- one shot-template per screenshot goes here -->
+                            <div class="shot-track" id="shot-track"></div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-ghost btn-square" id="shot-next" aria-label="Next screenshot">
+                        <i class="fa-solid fa-caret-right" aria-hidden="true"></i>
+                    </button>
+                </section>
+
+                <!-- ================= DOTS: one dot-template per screenshot goes here ================= -->
+                <div class="shot-dots slide-up" style="--delay:1" id="shot-dots"></div>
+
+                <!-- ================= DESCRIPTION: your character tells about the project ================= -->
+                <div class="project-talk slide-up" style="--delay:2">
+
+                    <div class="talk-portrait">
+                        <img src="assets/me.png" alt="Diyana Nadra">
+                    </div>
+
+                    <div class="dialog talk-box">
+                        <span class="dialog-name">Diyana</span>
+                        <button type="button" class="typewriter" aria-label="Show the whole description">
+                            <span class="tw-full" id="project-description"></span>
+                            <span class="tw-shown" aria-hidden="true"></span>
+                        </button>
+
+                        <!-- website button: hidden when the project's link is '' -->
+                        <a href="#" target="_blank" rel="noopener" class="btn talk-link" id="project-link" hidden>
+                            Visit website <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                        </a>
+
+                        <span class="dialog-next" aria-hidden="true">▼</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+
+        <!-- ================= TEMPLATE: ONE SCREENSHOT ================= -->
+        <template id="shot-template">
+            <div class="shot" data-fill="shot">
+                <img src="" alt="" data-fill="picture">
+            </div>
+        </template>
+
+        <!-- ================= TEMPLATE: ONE DOT ================= -->
+        <template id="dot-template">
+            <button type="button" class="shot-dot"><span></span></button>
+        </template>
+
+        <!-- 1. puts the top bar / switch into the page   2. switch, menus, typewriter -->
+        <script src="modules/shared/include.js"></script>
+        <script src="modules/shared/shared.js"></script>
+        <!-- 3. the list of projects   4. builds this page from that list -->
+        <script src="modules/projects/projects-data.js"></script>
+        <script src="modules/projects/projects.js"></script>
+
+    </body>
+</html>

@@ -1,0 +1,221 @@
+/* =====================================================================
+   about.css - only for about.html (my character sheet)
+   ===================================================================== */
+
+
+/* ===================== LAYOUT: left column + right column ===================== */
+
+.sheet {
+    flex-grow:1;
+    display:flex;
+    gap:48px;
+}
+
+.sheet-left {
+    width:300px;
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+}
+
+.sheet-right {
+    flex-grow:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+}
+
+
+/* ===================== LEFT: PORTRAIT ===================== */
+
+.portrait {
+    aspect-ratio:300 / 330;
+    padding:8px;
+    background:#300000;
+    box-shadow:0 0 0 4px #ffffff, 10px 10px 0 4px #18949f;
+}
+
+[data-theme="dark"] .portrait {
+    background:#cc0000;
+    box-shadow:0 0 0 4px #550000, 10px 10px 0 4px #550000;
+}
+
+.portrait img {
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 30%;
+    background:#ffffff;
+}
+
+
+/* ===================== LEFT: STAT BARS ===================== */
+
+.stats {
+    padding:16px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    font-family:var(--font-pixel);
+    font-size:16px;
+}
+
+.stat {
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.stat-name {
+    width:110px;
+    flex-shrink:0;
+}
+
+/*empty bar*/
+.stat-bar {
+    flex-grow:1;
+    height:14px;
+    background:var(--ghost);
+    border:2px solid var(--ghost-edge);
+}
+
+/*filled part*/
+.stat-fill {
+    display:block;
+    height:100%;
+    background:var(--choice);
+}
+
+
+/* ===================== RIGHT: NAME ===================== */
+
+.sheet-name {
+    margin:0;
+    font-family:var(--font-title);
+    font-size:44px;
+    letter-spacing:3px;
+    color:var(--title);
+}
+
+.sheet-role {
+    margin:6px 0 0 0;
+    font-size:19px;
+    font-style:italic;
+}
+
+/*space above the dialogue box for its name tag*/
+.sheet-right .dialog {
+    margin-top:8px;
+}
+
+
+/* ===================== RIGHT: EDUCATION ===================== */
+
+.education {
+    padding:14px 18px;
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px 18px;
+}
+
+.education-text {
+    margin:0;
+    font-size:16px;
+}
+
+
+/* ===================== RIGHT: SKILLS ===================== */
+
+/*as many boxes per row as fit (at least 200px each), so more groups just wrap*/
+.skill-groups {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+    gap:16px;
+}
+
+/*content centred inside each box*/
+.skill-group {
+    padding:16px 14px 18px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+    text-align:center;
+}
+
+.skill-group .tags {
+    justify-content:center;
+}
+
+/*HOVER: the box and the skill rise a little, NO glow
+  (glow is only for things you can press, so these don't look clickable)*/
+.skill-group,
+.skill-group .tags li {
+    transition:transform 0.2s, border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.skill-group:hover {
+    transform:translateY(-4px);
+    border-color:var(--title);
+}
+
+.skill-group .tags li:hover {
+    transform:translateY(-3px);
+    color:var(--bg);
+    background:var(--fg);
+}
+
+
+/* ===================== RIGHT: RESUME BUTTON ===================== */
+
+.resume-row {
+    margin-top:6px;
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:18px;
+}
+
+.resume-note {
+    margin:0;
+    font-family:var(--font-pixel);
+    font-size:15px;
+}
+
+/*the scroll icon wiggles now and then*/
+.wiggle {
+    animation:wiggle 1.6s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform:rotate(0); }
+    10%      { transform:rotate(-12deg); }
+    20%      { transform:rotate(10deg); }
+    30%      { transform:rotate(0); }
+}
+
+
+/* ===================== PHONE / SMALL SCREEN ===================== */
+
+@media (max-width: 900px) {
+
+    /*left column goes on top*/
+    .sheet {
+        flex-direction:column;
+        gap:28px;
+    }
+
+    .sheet-left {
+        width:100%;
+        max-width:320px;
+        margin:0 auto;
+    }
+
+    .sheet-name {
+        font-size:32px;
+    }
+}

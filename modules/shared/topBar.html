@@ -1,0 +1,25 @@
+<!-- =====================================================================
+     topBar.html - the bar at the top of every page except the title screen
+         left   = back button   ({{backLink}}, {{backText}})
+         middle = page title    ({{title}})
+         right  = light / dark switch
+     The {{...}} parts are filled in by include.js from the page's data-... values.
+     ===================================================================== -->
+<header class="top-bar">
+    <div>
+        <a href="{{backLink}}" class="btn btn-ghost">
+            <i class="fa-solid fa-caret-left" aria-hidden="true"></i> {{backText}}
+        </a>
+    </div>
+
+    <h1 class="top-bar-title">{{title}}</h1>
+
+    <div class="top-bar-right">
+        <!-- LIGHT / DARK SWITCH (same as themeSwitch.html) -->
+        <button type="button" class="theme-switch" role="switch" aria-checked="false" aria-label="Dark mode">
+            <span class="switch-knob" aria-hidden="true"></span>
+            <span class="switch-icon switch-sun" aria-hidden="true"><i class="fa-solid fa-sun"></i></span>
+            <span class="switch-icon switch-moon" aria-hidden="true"><i class="fa-solid fa-moon"></i></span>
+        </button>
+    </div>
+</header>

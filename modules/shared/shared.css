@@ -1,0 +1,562 @@
+/* =====================================================================
+   shared.css - used by EVERY page
+   1. Colours (light + dark)
+   2. Page basics
+   3. Button      - things you press (filled, chunky 3D edge)
+   4. Choice      - menu / list items (rise + glow when chosen)
+   5. Panel       - normal info boxes (flat, thin line)
+   6. Dialogue    - where your character talks (rounded, gold inner line, name tag)
+   7. Game frame  - around pictures (thick border, gold studs, name plate)
+   8. Light / dark switch
+   9. Top bar (back · title · switch)
+   10. Slide-up animation (0.2s)
+   ===================================================================== */
+
+
+/* ===================== 1. COLOURS ===================== */
+
+/*LIGHT MODE (hero side): beige + sea blue, a bright beach day*/
+:root {
+    --bg:#E6DFD3;              /*page background*/
+    --fg:#300000;              /*normal text*/
+    --title:#0f6f78;           /*big titles*/
+
+    --panel:rgba(255, 255, 255, 0.75);
+    --line:rgba(48, 0, 0, 0.25);
+
+    --btn:#eac231;             /*main button (gold)*/
+    --btn-text:#300000;
+    --btn-edge:#8a6d00;
+    --ghost:#fbf8f2;           /*second button (back, arrows, socials)*/
+    --ghost-edge:#300000;
+
+    --choice:#18949f;          /*chosen menu item*/
+    --glow:rgba(94, 196, 205, 0.9);
+    --glow-edge:#5EC4CD;
+
+    --dialog:#fffaf0;
+    --dialog-edge:#0f6f78;
+    --gold:#eac231;
+
+    --frame:#5EC4CD;
+    --frame-edge:#300000;
+    --frame-line:#ffffff;
+
+    --font-title:'Cinzel', Georgia, serif;
+    --font-pixel:'Pixelify Sans', monospace;
+    --font-text:Georgia, serif;
+}
+
+/*DARK MODE (villain side): blood red leads, emerald only a small touch*/
+[data-theme="dark"] {
+    --bg:#120606;
+    --fg:#E6DFD3;
+    --title:#ff6b6b;
+
+    --panel:#1f0a0a;
+    --line:rgba(204, 0, 0, 0.55);
+
+    --btn:#cc0000;
+    --btn-text:#ffffff;
+    --btn-edge:#550000;
+    --ghost:#2a0c0c;
+    --ghost-edge:#8A0303;
+
+    --choice:#8A0303;
+    --glow:rgba(204, 0, 0, 0.75);
+    --glow-edge:#ff3b3b;
+
+    --dialog:#0b0303;
+    --dialog-edge:#cc0000;
+
+    --frame:#0b0303;
+    --frame-edge:#8A0303;
+    --frame-line:#cc0000;
+}
+
+
+/* ===================== 2. PAGE BASICS ===================== */
+
+* {
+    box-sizing:border-box;
+}
+
+body {
+    margin:0;
+    min-height:100vh;
+    font-family:var(--font-text);
+    color:var(--fg);
+    background:var(--bg);
+    transition:background 0.2s, color 0.2s;
+}
+
+/*the box that holds each page's content*/
+.screen {
+    max-width:1280px;
+    min-height:100vh;
+    margin:0 auto;
+    padding:36px 80px 44px;
+    display:flex;
+    flex-direction:column;
+    gap:30px;
+}
+
+/*anything with the hidden attribute is really hidden (even buttons/boxes that set their own display)*/
+[hidden] {
+    display:none !important;
+}
+
+/*hides text on screen, screen readers still read it*/
+.sr-only {
+    position:absolute;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    clip:rect(0, 0, 0, 0);
+    white-space:nowrap;
+}
+
+
+/* ===================== 3. BUTTON ===================== */
+
+.btn {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    min-height:52px;
+    padding:0 22px;
+    font-family:var(--font-pixel);
+    font-size:20px;
+    font-weight:600;
+    text-decoration:none;
+    cursor:pointer;
+    color:var(--btn-text);
+    background:var(--btn);
+    border:3px solid var(--btn-edge);
+    box-shadow:0 6px 0 var(--btn-edge);
+    transition:transform 0.2s, box-shadow 0.2s;
+}
+
+/*second button: back, arrows, socials*/
+.btn-ghost {
+    --btn:var(--ghost);
+    --btn-text:var(--fg);
+    --btn-edge:var(--ghost-edge);
+}
+
+/*square button: arrows, social icons*/
+.btn-square {
+    width:56px;
+    height:56px;
+    padding:0;
+    font-size:22px;
+}
+
+/*bigger button: resume*/
+.btn-big {
+    min-height:60px;
+    padding:0 28px;
+    font-size:22px;
+}
+
+/*pressed down*/
+.btn:active {
+    transform:translateY(4px);
+    box-shadow:0 2px 0 var(--btn-edge);
+}
+
+
+/* ===================== 4. CHOICE (menu / list items) ===================== */
+
+.choice {
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-height:52px;
+    padding:0 16px;
+    font-family:var(--font-pixel);
+    font-size:24px;
+    text-align:left;
+    text-decoration:none;
+    cursor:pointer;
+    color:var(--fg);
+    background:transparent;
+    border:3px solid transparent;
+    transition:transform 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
+}
+
+/*the blinking ▶ in front of the chosen item*/
+.choice-arrow {
+    width:16px;
+    font-size:16px;
+    visibility:hidden;
+    animation:blink 1s steps(2) infinite;
+}
+
+/*chosen item (JS adds "on" when you hover it or use the arrow keys)*/
+.choice.on {
+    color:#ffffff;
+    background:var(--choice);
+    border-color:var(--glow-edge);
+}
+
+.choice.on .choice-arrow {
+    visibility:visible;
+}
+
+
+/* ===== SAME HOVER FOR EVERYTHING YOU CAN PRESS: up 4px + glow ===== */
+
+.btn:hover,
+.btn:focus-visible,
+.theme-switch:hover,
+.theme-switch:focus-visible {
+    transform:translateY(-4px);
+    box-shadow:0 10px 0 var(--btn-edge), 0 0 0 2px var(--glow-edge), 0 0 26px 6px var(--glow);
+    outline:none;
+}
+
+.choice.on {
+    transform:translateY(-4px);
+    box-shadow:0 0 0 2px var(--glow-edge), 0 0 26px 6px var(--glow);
+    outline:none;
+}
+
+
+/* ===================== 5. PANEL ===================== */
+
+.panel {
+    background:var(--panel);
+    border:3px solid var(--line);
+}
+
+/*small label inside a panel (EDUCATION, SKILLS...)*/
+.label {
+    margin:0;
+    font-family:var(--font-pixel);
+    font-size:15px;
+    letter-spacing:1px;
+    color:var(--title);
+}
+
+/*small rounded tags (HTML, CSS...)*/
+.tags {
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.tags li {
+    padding:5px 12px;
+    font-family:var(--font-pixel);
+    font-size:15px;
+    border:2px solid var(--ghost-edge);
+}
+
+
+/* ===================== 6. DIALOGUE BOX ===================== */
+
+.dialog {
+    position:relative;
+    padding:26px 30px 22px;
+    border-radius:10px;
+    background:var(--dialog);
+    border:4px solid var(--dialog-edge);
+    box-shadow:inset 0 0 0 4px var(--dialog), inset 0 0 0 6px var(--gold), 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+/*speaker's name on top of the box*/
+.dialog-name {
+    position:absolute;
+    top:-20px;
+    left:22px;
+    padding:3px 14px;
+    border-radius:6px;
+    font-family:var(--font-pixel);
+    font-size:16px;
+    color:#ffffff;
+    background:var(--dialog-edge);
+    border:3px solid var(--gold);
+}
+
+/* ----- TYPEWRITER TEXT (shared.js types it) -----
+   .tw-full  = the whole text, invisible, keeps the box the right height (screen readers read this one)
+   .tw-shown = the letters that have been typed so far */
+.typewriter {
+    display:grid;
+    width:100%;
+    padding:0;
+    text-align:left;
+    font:inherit;
+    font-size:18px;
+    line-height:1.6;
+    color:inherit;
+    background:transparent;
+    border:0;
+    cursor:pointer;
+}
+
+.tw-full,
+.tw-shown {
+    grid-area:1 / 1;
+}
+
+.tw-full {
+    opacity:0;
+}
+
+/*no JavaScript: just show the whole text*/
+html:not(.js) .tw-full {
+    opacity:1;
+}
+
+/*▼ that bounces when the text is finished*/
+.dialog-next {
+    position:absolute;
+    right:16px;
+    bottom:10px;
+    font-size:14px;
+    color:var(--gold);
+    visibility:hidden;
+    animation:nudge 0.8s ease-in-out infinite;
+}
+
+.dialog.done .dialog-next {
+    visibility:visible;
+}
+
+
+/* ===================== 7. GAME FRAME ===================== */
+
+.frame {
+    position:relative;
+    padding:14px;
+    background:var(--frame);
+    border:4px solid var(--frame-edge);
+    box-shadow:inset 0 0 0 4px var(--frame-line);
+}
+
+/*gold studs on the 4 corners*/
+.stud {
+    position:absolute;
+    width:16px;
+    height:16px;
+    background:var(--gold);
+    border:3px solid var(--frame-edge);
+}
+
+.stud-tl { top:-10px;    left:-10px; }
+.stud-tr { top:-10px;    right:-10px; }
+.stud-bl { bottom:-10px; left:-10px; }
+.stud-br { bottom:-10px; right:-10px; }
+
+/*name plate on top of the frame*/
+.plate {
+    position:absolute;
+    z-index:2;
+    top:-20px;
+    left:50%;
+    transform:translateX(-50%);
+    margin:0;
+    padding:4px 18px;
+    white-space:nowrap;
+    font-family:var(--font-pixel);
+    font-size:15px;
+    color:#ffffff;
+    background:var(--frame-edge);
+    border:3px solid var(--gold);
+}
+
+/*the picture area inside the frame (16:9, like a game screen)*/
+.frame-screen {
+    aspect-ratio:16 / 9;
+    max-height:380px;
+    width:100%;
+    overflow:hidden;
+    background:#111111;
+    border:3px solid var(--frame-edge);
+}
+
+.frame-screen img {
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+/* ----- picture not added yet -----
+   shared.js adds "missing" to a [data-pic] box when its picture file is not there.
+   The picture is hidden and the file name is shown instead. */
+[data-pic].missing {
+    position:relative;
+    background:#2b2b2b;
+}
+
+[data-pic].missing img {
+    visibility:hidden;
+}
+
+[data-pic].missing::after {
+    content:"Add picture: " attr(data-pic);
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    text-align:center;
+    overflow-wrap:anywhere;
+    font-family:var(--font-pixel);
+    font-size:16px;
+    color:#ffffff;
+}
+
+
+/* ===================== 8. LIGHT / DARK SWITCH ===================== */
+
+.theme-switch {
+    --btn-edge:var(--ghost-edge);  /*so the hover shadow uses the switch's edge colour*/
+    position:relative;
+    display:flex;
+    align-items:center;
+    width:132px;
+    height:52px;
+    padding:0;
+    cursor:pointer;
+    color:var(--fg);
+    background:var(--ghost);
+    border:3px solid var(--ghost-edge);
+    box-shadow:0 6px 0 var(--ghost-edge);
+    transition:transform 0.2s, box-shadow 0.2s;
+}
+
+/*the sliding block: on the sun in light mode, on the moon in dark mode*/
+.switch-knob {
+    position:absolute;
+    top:4px;
+    left:4px;
+    width:58px;
+    height:38px;
+    background:var(--choice);
+    border:2px solid var(--glow-edge);
+    transition:transform 0.2s;
+}
+
+[data-theme="dark"] .switch-knob {
+    transform:translateX(62px);
+}
+
+.switch-icon {
+    position:relative;
+    z-index:1;
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    transition:color 0.2s;
+}
+
+/*the icon under the knob is white*/
+.switch-sun                          { color:#ffffff; }
+[data-theme="dark"] .switch-sun      { color:var(--fg); }
+[data-theme="dark"] .switch-moon     { color:#ffffff; }
+
+/*"LIGHT MODE" / "DARK MODE" text next to the switch*/
+.mode-label {
+    padding:6px 12px;
+    font-family:var(--font-pixel);
+    font-size:15px;
+}
+
+.mode-dark                           { display:none; }
+[data-theme="dark"] .mode-light      { display:none; }
+[data-theme="dark"] .mode-dark       { display:inline; }
+
+
+/* ===================== 9. TOP BAR ===================== */
+
+.top-bar {
+    display:grid;
+    grid-template-columns:220px 1fr 220px;  /*back · title · switch*/
+    align-items:center;
+    gap:16px;
+}
+
+.top-bar-title {
+    margin:0;
+    text-align:center;
+    font-family:var(--font-title);
+    font-size:40px;
+    letter-spacing:3px;
+    color:var(--title);
+}
+
+.top-bar-right {
+    display:flex;
+    justify-content:flex-end;
+}
+
+
+/* ===================== 10. SLIDE-UP ANIMATION ===================== */
+/*Add class="slide-up" to anything that should slide up when the page loads.
+  style="--delay:1" makes it start a little after the one before it.*/
+
+.slide-up {
+    animation:slideUp 0.2s ease-out both;
+    animation-delay:calc(var(--delay, 0) * 0.08s);
+}
+
+@keyframes slideUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:none; }
+}
+
+@keyframes blink {
+    50% { opacity:0; }
+}
+
+@keyframes nudge {
+    50% { transform:translateY(3px); }
+}
+
+/*people who turned off animations in their device settings*/
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation:none !important;
+        transition:none !important;
+    }
+}
+
+
+/* ===================== PHONE / SMALL SCREEN ===================== */
+
+@media (max-width: 900px) {
+
+    .screen {
+        padding:20px 16px 32px;
+        gap:24px;
+    }
+
+    /*top bar: back + switch on one row, title below*/
+    .top-bar {
+        grid-template-columns:1fr auto;
+    }
+
+    .top-bar-title {
+        grid-column:1 / -1;
+        grid-row:2;
+        font-size:30px;
+    }
+
+    .btn {
+        font-size:18px;
+    }
+}

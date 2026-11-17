@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!-- ===== INDEX.HTML - TITLE SCREEN (the opening of the game) ===== -->
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Portfolio - Diyana Nadra</title>
+
+        <!-- fonts: Cinzel (big titles), Pixelify Sans (game buttons), Georgia (normal text, already on every computer) -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Pixelify+Sans:wght@400;600&display=swap">
+
+        <!-- icons (fa-github, fa-sun, fa-moon...) -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+        <!-- shared look first, then this page's own look -->
+        <link rel="stylesheet" href="modules/shared/shared.css">
+        <link rel="stylesheet" href="modules/title/title.css">
+
+        <script>
+            /*tells the CSS that JavaScript is on (the typewriter needs it)*/
+            document.documentElement.classList.add('js');
+
+            /*Light and Dark Mode (part 1): pick the theme BEFORE the page shows, so it never flashes*/
+            try {
+                var savedTheme = localStorage.getItem('theme');
+
+                if (savedTheme) {
+                    /*user picked a theme before -> use it*/
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    /*first visit -> follow the phone/laptop setting*/
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {
+            }
+        </script>
+    </head>
+
+    <body>
+
+        <main class="title-screen">
+
+            <!-- ================= BACKGROUND =================
+                 1. title-scene = a simple drawn beach (only a placeholder)
+                 2. title-bg    = YOUR game picture. Put it at:
+                        assets/bg/title-light.png  (light mode)
+                        assets/bg/title-dark.png   (dark mode)
+                    It covers the drawn beach automatically, nothing else to change. -->
+            <div class="title-scene" aria-hidden="true">
+                <div class="scene-sun"></div>
+                <div class="scene-sea"></div>
+                <div class="scene-sand"></div>
+            </div>
+            <div class="title-bg" aria-hidden="true"></div>
+
+
+            <!-- ================= TOP RIGHT: LIGHT / DARK SWITCH ================= -->
+            <div class="title-mode slide-up">
+                <span class="mode-label panel">
+                    <span class="mode-light">LIGHT MODE</span>
+                    <span class="mode-dark">DARK MODE</span>
+                </span>
+                <div data-include="modules/shared/themeSwitch.html"></div>
+            </div>
+
+
+            <!-- ================= MIDDLE: TITLE + MENU (left) and CHARACTER (right) ================= -->
+            <div class="title-main">
+
+                <!-- left: game title + menu -->
+                <div class="title-left slide-up">
+
+                    <header>
+                        <h1 class="game-title">DIYANA<br>NADRA</h1>
+                        <p class="game-subtitle">Final Year Software Engineering Student</p>
+                    </header>
+
+                    <!-- MENU: mouse or ↑ ↓ to choose, Enter or click to open (shared.js) -->
+                    <nav class="panel title-menu" aria-label="Main menu">
+                        <ul class="choice-list">
+                            <li><a href="about.html" class="choice"><span class="choice-arrow" aria-hidden="true">▶</span>Start</a></li>
+                            <li><a href="projects.html" class="choice"><span class="choice-arrow" aria-hidden="true">▶</span>Projects</a></li>
+                            <li><a href="assets/resume/Diyana-Nadra-Resume.pdf" target="_blank" rel="noopener" class="choice"><span class="choice-arrow" aria-hidden="true">▶</span>Resume</a></li>
+                            <li><a href="game.html" class="choice"><span class="choice-arrow" aria-hidden="true">▶</span>Play</a></li>
+                        </ul>
+                    </nav>
+
+                    <p class="title-hint">↑ ↓ to choose · Enter to select</p>
+                </div>
+
+                <!-- right: your character -->
+                <div class="character slide-up" style="--delay:1">
+                    <div class="character-frame">
+                        <img src="assets/me.png" alt="Diyana Nadra as the game character">
+                    </div>
+                    <p class="character-plate panel">
+                        <span class="character-level">Lv. 4</span>
+                        <span>Software Engineer</span>
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- ================= BOTTOM: SOCIALS + COPYRIGHT ================= -->
+            <footer class="title-bottom slide-up" style="--delay:2">
+                <h2 class="sr-only">Socials</h2>
+                <ul class="socials">
+                    <li>
+                        <a href="https://github.com/lcdyann" class="btn btn-ghost btn-square" aria-label="GitHub">
+                            <i class="fa-brands fa-github" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.linkedin.com/in/diyana-nadra/" class="btn btn-ghost btn-square" aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="mailto:lcdyann@gmail.com" class="btn btn-ghost btn-square" aria-label="Email">
+                            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                </ul>
+
+                <p class="copyright panel">&copy; Diyana Nadra 2026</p>
+            </footer>
+
+        </main>
+
+        <!-- 1. puts the top bar / switch into the page   2. switch, menus, typewriter -->
+        <script src="modules/shared/include.js"></script>
+        <script src="modules/shared/shared.js"></script>
+
+    </body>
+</html>

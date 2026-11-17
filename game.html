@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<!-- ===== GAME.HTML - "Play" in the menu: BUG SNAKE =====
+     The game rules and movement are in modules/game/game.js
+     The look is in modules/game/game.css
+     The bug and cola pictures are assets/game/bug.svg and assets/game/cola.svg (swap them for your own) -->
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bug Snake - Diyana Nadra</title>
+
+        <!-- fonts: Cinzel (big titles), Pixelify Sans (game buttons), Georgia (normal text, already on every computer) -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Pixelify+Sans:wght@400;600&display=swap">
+
+        <!-- icons (fa-github, fa-sun, fa-moon...) -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+        <!-- shared look first, then this page's own look -->
+        <link rel="stylesheet" href="modules/shared/shared.css">
+        <link rel="stylesheet" href="modules/game/game.css">
+
+        <script>
+            /*tells the CSS that JavaScript is on (the typewriter needs it)*/
+            document.documentElement.classList.add('js');
+
+            /*Light and Dark Mode (part 1): pick the theme BEFORE the page shows, so it never flashes*/
+            try {
+                var savedTheme = localStorage.getItem('theme');
+
+                if (savedTheme) {
+                    /*user picked a theme before -> use it*/
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    /*first visit -> follow the phone/laptop setting*/
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {
+            }
+        </script>
+    </head>
+
+    <body>
+
+        <main class="screen">
+
+            <!-- top bar: back button · title · light/dark switch (modules/shared/topBar.html) -->
+            <div data-include="modules/shared/topBar.html" data-back-link="index.html" data-back-text="Menu" data-title="BUG SNAKE"></div>
+
+            <div class="game">
+
+                <!-- ================= BOARD (in a game frame) ================= -->
+                <div class="frame board-frame slide-up">
+                    <span class="stud stud-tl" aria-hidden="true"></span>
+                    <span class="stud stud-tr" aria-hidden="true"></span>
+                    <span class="stud stud-bl" aria-hidden="true"></span>
+                    <span class="stud stud-br" aria-hidden="true"></span>
+                    <!-- plate on top: "Bugs squashed: 3" or "SCORE ×2" (game.js changes it) -->
+                    <p class="plate" id="plate">◆ Bugs squashed: 0 ◆</p>
+
+                    <div class="board-wrap">
+
+                        <!-- THE BOARD: 15 × 15 squares. game.js fills it with the squares
+                             and adds a class to a square to show what is on it:
+                               "head"  = you     "body" = your trail
+                               "bug"   = a bug   "cola" = a cola -->
+                        <div class="board" id="board" aria-label="Game board. Use the arrow keys, swipe, or the arrow buttons."></div>
+
+                        <!-- START / GAME OVER screen on top of the board -->
+                        <div class="board-message" id="message">
+                            <p class="message-title" id="message-title">BUG SNAKE</p>
+                            <p class="message-text" id="message-text">Squash the bugs, grab the cola, don't crash into the wall or your own trail.</p>
+                            <button type="button" class="btn" id="start-btn">Start <i class="fa-solid fa-caret-right" aria-hidden="true"></i></button>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- ================= SIDE: SCORE + CONTROLS ================= -->
+                <div class="game-side slide-up" style="--delay:1">
+
+                    <!-- scores -->
+                    <div class="scores">
+                        <div class="panel score-box">
+                            <p class="score-label">SCORE</p>
+                            <p class="score-number" id="score">0</p>
+                        </div>
+                        <div class="panel score-box">
+                            <p class="score-label">BEST</p>
+                            <p class="score-number" id="best">0</p>
+                        </div>
+                    </div>
+
+                    <!-- cola timer: only shown while double score is on -->
+                    <div class="panel cola-box" id="cola-box" hidden>
+                        <p class="cola-title">COLA POWER · SCORE ×2</p>
+                        <div class="cola-bar"><div class="cola-fill" id="cola-fill"></div></div>
+                    </div>
+
+                    <!-- arrow buttons (for phones and mouse) -->
+                    <div class="pad">
+                        <button type="button" class="btn btn-ghost pad-btn pad-up" data-dir="up" aria-label="Up"><i class="fa-solid fa-caret-up" aria-hidden="true"></i></button>
+                        <button type="button" class="btn btn-ghost pad-btn pad-left" data-dir="left" aria-label="Left"><i class="fa-solid fa-caret-left" aria-hidden="true"></i></button>
+                        <button type="button" class="btn btn-ghost pad-btn pad-down" data-dir="down" aria-label="Down"><i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
+                        <button type="button" class="btn btn-ghost pad-btn pad-right" data-dir="right" aria-label="Right"><i class="fa-solid fa-caret-right" aria-hidden="true"></i></button>
+                    </div>
+
+                    <!-- how to play -->
+                    <div class="panel how-to">
+                        <p class="label">HOW TO PLAY</p>
+                        <ul>
+                            <li>Laptop: arrow keys or W A S D. Phone: swipe on the game, or tap the arrow buttons.</li>
+                            <li>Eat a bug: <b>+10</b>, and your trail grows.</li>
+                            <li>Grab a cola: <b>double score</b> for a while.</li>
+                            <li>It gets faster. Don't hit the wall or your own trail!</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- 1. puts the top bar / switch into the page   2. switch, menus, typewriter -->
+        <script src="modules/shared/include.js"></script>
+        <script src="modules/shared/shared.js"></script>
+        <!-- 3. the game -->
+        <script src="modules/game/game.js"></script>
+
+    </body>
+</html>
