@@ -1,0 +1,8 @@
+{
+  "name": "diyananadra-portfolio",
+  "private": true,
+  "description": "Diyana Nadra's RPG portfolio. Only the api/ folder uses the package below (to talk to the Redis database).",
+  "dependencies": {
+    "redis": "^4.7.0"
+  }
+}
