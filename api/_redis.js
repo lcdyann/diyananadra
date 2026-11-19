@@ -7,8 +7,25 @@
    (Vercel dashboard -> your project -> Storage). They are read from process.env below.
    ===================================================================== */
 
-var REDIS_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-var REDIS_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+/*Finds a key by the END of its name, so it works with or without a prefix:
+    KV_REST_API_URL, STORAGE_KV_REST_API_URL, UPSTASH_REDIS_REST_URL ... all work.
+  (READ_ONLY keys are skipped: they can read but not save scores.)*/
+function findKey(endings) {
+    var names = Object.keys(process.env);
+
+    for (var i = 0; i < endings.length; i++) {
+        var match = names.find(function (name) {
+            return name.endsWith(endings[i]) && name.indexOf('READ_ONLY') === -1;
+        });
+        if (match) {
+            return process.env[match];
+        }
+    }
+    return undefined;
+}
+
+var REDIS_URL = findKey(['KV_REST_API_URL', 'REDIS_REST_URL']);
+var REDIS_TOKEN = findKey(['KV_REST_API_TOKEN', 'REDIS_REST_TOKEN']);
 
 /*runs several Redis commands in one go, e.g.
       redis([ ['INCR', 'site:visits'], ['GET', 'site:visits'] ])
