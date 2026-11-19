@@ -1,13 +1,16 @@
 /* =====================================================================
    about.css - only for about.html (my character sheet)
+   1. Layout          2. Portrait + stat bars    3. Name + resume
+   4. Education       5. Core coursework (rolling capsules)
+   6. Skills (gacha machines + tray)              7. Phone
    ===================================================================== */
 
 
-/* ===================== LAYOUT: left column + right column ===================== */
+/* ===================== 1. LAYOUT: left column + right column ===================== */
 
 .sheet {
-    flex-grow:1;
     display:flex;
+    align-items:center;      /*profile box centred against the right column*/
     gap:48px;
 }
 
@@ -28,7 +31,7 @@
 }
 
 
-/* ===================== LEFT: PORTRAIT ===================== */
+/* ===================== 2. LEFT: PORTRAIT ===================== */
 
 .portrait {
     aspect-ratio:300 / 330;
@@ -52,7 +55,7 @@
 }
 
 
-/* ===================== LEFT: STAT BARS ===================== */
+/* ===================== 2. LEFT: STAT BARS ===================== */
 
 .stats {
     padding:16px 18px;
@@ -90,7 +93,7 @@
 }
 
 
-/* ===================== RIGHT: NAME ===================== */
+/* ===================== 3. RIGHT: NAME ===================== */
 
 .sheet-name {
     margin:0;
@@ -112,7 +115,7 @@
 }
 
 
-/* ===================== RIGHT: EDUCATION ===================== */
+/* ===================== 4. RIGHT: EDUCATION ===================== */
 
 .education {
     padding:14px 18px;
@@ -128,62 +131,28 @@
 }
 
 
-/* ===================== RIGHT: SKILLS ===================== */
+/* ===================== 3. NAME ROW + RESUME BUTTON ===================== */
 
-/*as many boxes per row as fit (at least 200px each), so more groups just wrap*/
-.skill-groups {
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
-    gap:16px;
+/*name on the left, resume button on the right (button goes under the name on narrow screens)*/
+.name-row {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:16px 24px;
 }
 
-/*content centred inside each box*/
-.skill-group {
-    padding:16px 14px 18px;
+.resume-box {
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:14px;
-    text-align:center;
-}
-
-.skill-group .tags {
-    justify-content:center;
-}
-
-/*HOVER: the box and the skill rise a little, NO glow
-  (glow is only for things you can press, so these don't look clickable)*/
-.skill-group,
-.skill-group .tags li {
-    transition:transform 0.2s, border-color 0.2s, background 0.2s, color 0.2s;
-}
-
-.skill-group:hover {
-    transform:translateY(-4px);
-    border-color:var(--title);
-}
-
-.skill-group .tags li:hover {
-    transform:translateY(-3px);
-    color:var(--bg);
-    background:var(--fg);
-}
-
-
-/* ===================== RIGHT: RESUME BUTTON ===================== */
-
-.resume-row {
-    margin-top:6px;
-    display:flex;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:18px;
+    gap:6px;
 }
 
 .resume-note {
     margin:0;
     font-family:var(--font-pixel);
-    font-size:15px;
+    font-size:13px;
 }
 
 /*the scroll icon wiggles now and then*/
@@ -199,13 +168,418 @@
 }
 
 
-/* ===================== PHONE / SMALL SCREEN ===================== */
+/* ===================== 5. CORE COURSEWORK: ROLLING CAPSULES ===================== */
+
+.coursework {
+    padding:16px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+/*  [<]  [ capsules rolling ... ]  [>]  */
+.roll {
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+/*big, easy to press*/
+.roll-btn {
+    width:56px;
+    height:56px;
+    padding:0;
+    flex-shrink:0;
+    font-size:24px;
+}
+
+/*the window: edges fade out so balls roll in and out softly*/
+.roll-window {
+    flex-grow:1;
+    min-width:0;
+    overflow:hidden;
+    padding:12px 4px;
+    touch-action:pan-y;      /*sideways swipe = roll, up/down = scroll the page*/
+    cursor:grab;
+    -webkit-mask-image:linear-gradient(90deg, transparent, #000000 6%, #000000 94%, transparent);
+    mask-image:linear-gradient(90deg, transparent, #000000 6%, #000000 94%, transparent);
+}
+
+/*all capsules in one row; about.js moves it*/
+.roll-track {
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    gap:14px;
+    --spin:0deg;             /*how much the balls have turned (about.js changes it)*/
+}
+
+.roll-track li {
+    flex-shrink:0;
+}
+
+/*smooth slide for the < > buttons (about.js adds "stepping" for 0.6s)*/
+.roll-track.stepping,
+.roll-track.stepping .ball-spin {
+    transition:transform 0.6s cubic-bezier(0.25, 0.8, 0.3, 1);
+}
+
+/* ----- one capsule ball (58px: same as BALL_SIZE in about.js) ----- */
+.course-ball {
+    --ball:#5EC4CD;          /*colour of the top half (set by about.js from the course type)*/
+    width:58px;
+    height:58px;
+    padding:0;
+    cursor:pointer;
+    background:transparent;
+    border:0;
+    border-radius:50%;
+    transition:transform 0.2s;
+}
+
+/*the part that turns: top half colour, bottom half cream, line in the middle*/
+.ball-spin {
+    position:relative;
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    color:#300000;
+    border-radius:50%;
+    background:linear-gradient(var(--ball) 50%, #fffaf0 50%);
+    border:3px solid #300000;
+    box-shadow:0 4px 0 #300000;
+    transform:rotate(var(--spin));
+    transition:box-shadow 0.2s;
+}
+
+.ball-line {
+    position:absolute;
+    left:2px;
+    right:2px;
+    top:50%;
+    height:3px;
+    margin-top:-1px;
+    background:#300000;
+}
+
+.ball-spin i {
+    position:relative;       /*icon above the line*/
+}
+
+/*hover = rise, chosen = rise + glow (no glow on hover only, same as the rest of the site)*/
+.course-ball:hover,
+.course-ball:focus-visible {
+    transform:translateY(-6px);
+    outline:none;
+}
+
+.course-ball.on {
+    transform:translateY(-6px);
+}
+
+.course-ball.on .ball-spin {
+    box-shadow:0 0 0 3px var(--ball), 0 0 18px 4px var(--ball);
+}
+
+/* ----- the info box under the strip ----- */
+.course-info {
+    padding:22px 20px 16px;
+}
+
+.course-name {
+    margin:0 0 4px 0;
+    font-family:var(--font-pixel);
+    font-size:17px;
+    font-weight:600;
+}
+
+.course-text {
+    margin:0;
+    font-size:16px;
+    line-height:1.5;
+}
+
+
+/* ===================== 6. SKILLS: GACHA MACHINES + TRAY ===================== */
+
+.skills {
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+/*as many machines per row as fit*/
+.machines {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+    gap:18px;
+}
+
+/* ----- one machine ----- */
+.machine {
+    --machine:#5EC4CD;       /*the machine's colour (set by about.js from about-data.js)*/
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    cursor:pointer;
+    font:inherit;
+    color:inherit;
+    background:transparent;
+    border:0;
+    transition:transform 0.2s, filter 0.2s;
+}
+
+.machine:hover,
+.machine:focus-visible {
+    transform:translateY(-4px);
+    outline:none;
+}
+
+/*the open machine glows in its own colour*/
+.machine.open {
+    transform:translateY(-4px);
+    filter:drop-shadow(0 0 12px var(--machine));
+}
+
+/*glass dome*/
+.machine-dome {
+    position:relative;
+    width:112px;
+    height:92px;
+    overflow:hidden;
+    border-radius:56px 56px 8px 8px;
+    background:rgba(255, 255, 255, 0.55);
+    border:4px solid #300000;
+    box-shadow:inset 8px 8px 0 rgba(255, 255, 255, 0.6);
+}
+
+/*the little capsules inside the dome*/
+.dome-ball {
+    position:absolute;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    border:2px solid #300000;
+}
+
+.dome-ball.b1 { left:10px; bottom:6px;  background:linear-gradient(var(--machine) 50%, #ffffff 50%); }
+.dome-ball.b2 { left:40px; bottom:4px;  background:linear-gradient(#ffd84a 50%, #ffffff 50%); }
+.dome-ball.b3 { left:70px; bottom:8px;  background:linear-gradient(var(--machine) 50%, #ffffff 50%); }
+.dome-ball.b4 { left:24px; bottom:30px; background:linear-gradient(#ff6b8a 50%, #ffffff 50%); }
+.dome-ball.b5 { left:54px; bottom:32px; background:linear-gradient(#8a5cff 50%, #ffffff 50%); }
+
+/*body under the dome*/
+.machine-body {
+    position:relative;
+    width:124px;
+    height:84px;
+    margin-top:-4px;
+    padding-top:8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    background:var(--machine);
+    border:4px solid #300000;
+    border-radius:6px 6px 10px 10px;
+    box-shadow:inset 0 -8px 0 rgba(0, 0, 0, 0.18);
+}
+
+.machine-label {
+    padding:2px 8px;
+    font-family:var(--font-pixel);
+    font-size:12px;
+    font-weight:600;
+    color:#300000;
+    background:#fffaf0;
+    border:2px solid #300000;
+}
+
+/*the knob: a circle with a handle line*/
+.machine-knob {
+    position:relative;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:#fffaf0;
+    border:3px solid #300000;
+}
+
+.machine-knob::after {
+    content:"";
+    position:absolute;
+    left:50%;
+    top:2px;
+    width:6px;
+    height:20px;
+    margin-left:-3px;
+    border-radius:3px;
+    background:#300000;
+}
+
+/*knob turns once when clicked (about.js adds "spinning")*/
+.machine.spinning .machine-knob {
+    animation:knob 0.5s ease-in-out;
+}
+
+@keyframes knob {
+    to { transform:rotate(360deg); }
+}
+
+.machine-chute {
+    position:absolute;
+    right:8px;
+    bottom:6px;
+    width:24px;
+    height:18px;
+    border-radius:4px;
+    background:#300000;
+}
+
+.machine-hint {
+    margin-top:6px;
+    font-family:var(--font-pixel);
+    font-size:12px;
+}
+
+/* ----- the tray ----- */
+.tray {
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.tray-head {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+}
+
+.tray-title {
+    margin:0;
+    font-family:var(--font-pixel);
+    font-size:15px;
+    color:var(--title);
+}
+
+/*the capsule that drops and pops open (about.js adds "popping")*/
+.capsule {
+    position:relative;
+    width:40px;
+    height:40px;
+}
+
+.cap-top,
+.cap-bottom {
+    position:absolute;
+    left:0;
+    width:40px;
+    height:20px;
+    border:3px solid #300000;
+}
+
+.cap-top {
+    top:0;
+    border-bottom:0;
+    border-radius:20px 20px 0 0;
+}
+
+.cap-bottom {
+    bottom:0;
+    border-top:0;
+    border-radius:0 0 20px 20px;
+    background:#fffaf0;
+}
+
+.capsule.popping .cap-top    { animation:capTop 0.6s ease-out both; }
+.capsule.popping .cap-bottom { animation:capBottom 0.6s ease-out both; }
+
+@keyframes capTop {
+    0%   { transform:translateY(-40px); }
+    40%  { transform:translateY(0); }
+    100% { transform:translateY(-8px) rotate(-25deg); }
+}
+
+@keyframes capBottom {
+    0%   { transform:translateY(-40px); }
+    40%  { transform:translateY(0); }
+    100% { transform:translateY(4px) rotate(10deg); }
+}
+
+/*the skills: wrap onto new rows, so any number fits*/
+.tray-skills {
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+}
+
+/*one skill: logo + name, spills in when the capsule opens*/
+.skill-chip {
+    --machine:#5EC4CD;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:4px 14px 4px 4px;
+    font-family:var(--font-pixel);
+    font-size:15px;
+    background:var(--ghost);
+    border:2px solid var(--machine);
+    border-radius:999px;
+    animation:spill 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    transition:transform 0.2s;
+}
+
+/*rise on hover, no glow (skills are not buttons)*/
+.skill-chip:hover {
+    transform:translateY(-3px);
+}
+
+@keyframes spill {
+    from { opacity:0; transform:translateY(-20px) scale(0.4); }
+    to   { opacity:1; transform:none; }
+}
+
+/*round white spot for the logo*/
+.skill-icon {
+    width:32px;
+    height:32px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    border-radius:50%;
+    background:#ffffff;
+}
+
+/*no logo: first letters on the machine's colour*/
+.skill-icon.no-icon {
+    font-size:11px;
+    font-weight:600;
+    color:#300000;
+    background:var(--machine);
+}
+
+
+/* ===================== 7. PHONE / SMALL SCREEN ===================== */
 
 @media (max-width: 900px) {
 
-    /*left column goes on top*/
+    /*left column goes on top; both columns full width (stretch),
+      otherwise the long rolling strip makes the right column super wide*/
     .sheet {
         flex-direction:column;
+        align-items:stretch;
         gap:28px;
     }
 
@@ -217,5 +591,19 @@
 
     .sheet-name {
         font-size:32px;
+    }
+
+    /*phone: 2 machines per row, a little smaller*/
+    .machines {
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+    }
+
+    .roll {
+        gap:8px;
+    }
+
+    .roll-btn {
+        width:48px;
+        height:48px;
     }
 }
