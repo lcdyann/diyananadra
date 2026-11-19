@@ -91,7 +91,27 @@
     align-self:flex-end;
     display:flex;
     align-items:center;
+    flex-wrap:wrap;
+    justify-content:flex-end;
     gap:14px;
+}
+
+
+/* ----- visitor counter (arcade digits) ----- */
+.visitors {
+    padding:6px 12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:var(--font-pixel);
+    font-size:15px;
+}
+
+.visitors-number {
+    padding:1px 6px;
+    letter-spacing:2px;
+    color:#ffd84a;
+    background:#000000;
 }
 
 

@@ -56,11 +56,19 @@
             <div class="title-bg" aria-hidden="true"></div>
 
 
-            <!-- ================= TOP RIGHT: LIGHT / DARK SWITCH ================= -->
+            <!-- ================= TOP RIGHT: VISITORS + HERO / VILLAIN SWITCH ================= -->
             <div class="title-mode slide-up">
+
+                <!-- visitor counter: title.js asks /api/visits for the number -->
+                <span class="visitors panel">
+                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                    VISITORS
+                    <span class="visitors-number" id="visitor-count">-----</span>
+                </span>
+
                 <span class="mode-label panel">
-                    <span class="mode-light">LIGHT MODE</span>
-                    <span class="mode-dark">DARK MODE</span>
+                    <span class="mode-light">HERO MODE</span>
+                    <span class="mode-dark">VILLAIN MODE</span>
                 </span>
                 <div data-include="modules/shared/themeSwitch.html"></div>
             </div>
@@ -133,6 +141,9 @@
         <!-- 1. puts the top bar / switch into the page   2. switch, menus, typewriter -->
         <script src="modules/shared/include.js"></script>
         <script src="modules/shared/shared.js"></script>
+
+        <!-- 3. visitor counter -->
+        <script src="modules/title/title.js"></script>
 
     </body>
 </html>

@@ -6,6 +6,7 @@
    4. One step        - what happens every "tick"
    5. Start / game over
    6. Controls        - keys, arrow buttons, swipe
+   7. Leaderboard     - weekly Top 10 (talks to /api/leaderboard on Vercel)
    ===================================================================== */
 
 
@@ -106,7 +107,7 @@ function draw() {
 
     /*scores and plate*/
     document.getElementById('score').textContent = score;
-    document.getElementById('plate').textContent = doubleLeft > 0 ? '◆ SCORE ×2 ◆' : '◆ Bugs squashed: ' + bugsEaten + ' ◆';
+    document.getElementById('plate').textContent = doubleLeft > 0 ? '★ SCORE ×2 ★' : '◆ BUGS SQUASHED: ' + bugsEaten + ' ◆';
 
     /*cola timer bar*/
     document.getElementById('cola-box').hidden = (doubleLeft <= 0);
@@ -200,7 +201,13 @@ function startGame(firstDir) {
     playing = true;
     gameArea.classList.add('playing');
     message.hidden = true;
+    nameBox.hidden = true;
     draw();
+
+    /*phone: the leaderboard is on top, so scroll the board into view*/
+    if (window.innerWidth <= 900) {
+        document.getElementById('cabinet').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
     timer = setTimeout(step, speed);
 }
 
@@ -221,6 +228,19 @@ function gameOver() {
     messageTitle.textContent = 'CODE CRASHED!';
     messageText.textContent = 'You squashed ' + bugsEaten + ' bugs for ' + score + ' points.';
     startBtn.innerHTML = 'Play again <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>';
+
+    /*made this week's top 10? -> ask for a name first (part 7)*/
+    var rank = rankFor(score);
+    if (rank > 0) {
+        askForName(rank);
+    } else {
+        showGameOver();
+    }
+}
+
+/*shows the "CODE CRASHED!" screen with Play again*/
+function showGameOver() {
+    nameBox.hidden = true;
     message.hidden = false;
     startBtn.focus();
 }
@@ -235,6 +255,11 @@ startBtn.addEventListener('click', function () {
 /*turn the snake (or start the game if it is not running)*/
 function turn(name) {
     var want = DIRECTIONS[name];
+
+    /*the name box is open: arrows do nothing*/
+    if (!nameBox.hidden) {
+        return;
+    }
 
     if (!playing) {
         startGame(want);
@@ -257,6 +282,11 @@ document.addEventListener('keydown', function (e) {
         ArrowLeft: 'left', a: 'left',   A: 'left',
         ArrowRight: 'right', d: 'right', D: 'right'
     };
+
+    /*typing in the name box: let the letters through (W A S D are letters too!)*/
+    if (e.target.tagName === 'INPUT') {
+        return;
+    }
 
     if (keys[e.key]) {
         e.preventDefault(); /*stop the page from scrolling*/
@@ -299,4 +329,127 @@ gameArea.addEventListener('pointerup', function (e) {
     } else {
         turn(dy > 0 ? 'down' : 'up');
     }
+});
+
+
+/* ===================== 7. LEADERBOARD ===================== */
+/*Works on the live site (Vercel + Upstash). On your laptop there is no /api,
+  so the board says so and the game still works normally.*/
+
+var nameBox = document.getElementById('name-box');
+var nameForm = document.getElementById('name-form');
+var nameInput = document.getElementById('name-input');
+var nameError = document.getElementById('name-error');
+var lbBox = document.getElementById('leaderboard');
+var lbRows = document.querySelectorAll('#lb-list .lb-row');
+var lbStatus = document.getElementById('lb-status');
+var lbOnline = false;      /*true once the board has loaded*/
+var topList = [];          /*this week's top 10: [{name, score}, ...]*/
+var myName = '';           /*the name you saved (to light up your row)*/
+
+/* ----- fill the 10 rows ----- */
+function drawLeaderboard(top, resetsAt) {
+    topList = top;
+
+    lbRows.forEach(function (row, i) {
+        var entry = top[i];
+        row.querySelector('.lb-name').textContent = entry ? entry.name : '---';
+        row.querySelector('.lb-score').textContent = entry ? entry.score : '---';
+        row.classList.toggle('me', !!entry && entry.name === myName);
+    });
+
+    /*"THIS WEEK · RESETS IN 3D 14H"*/
+    var msLeft = new Date(resetsAt) - new Date();
+    var days = Math.floor(msLeft / 86400000);
+    var hours = Math.floor((msLeft % 86400000) / 3600000);
+    document.getElementById('lb-week').textContent = 'THIS WEEK · RESETS IN ' + days + 'D ' + hours + 'H';
+}
+
+/* ----- load the board when the page opens ----- */
+fetch('/api/leaderboard')
+    .then(function (response) {
+        if (!response.ok) throw new Error('no board');
+        return response.json();
+    })
+    .then(function (data) {
+        lbOnline = true;
+        drawLeaderboard(data.top, data.resetsAt);
+    })
+    .catch(function () {
+        lbStatus.textContent = 'The leaderboard works on the live site.';
+        lbStatus.hidden = false;
+    });
+
+/* ----- what rank would this score get? (0 = not in the top 10) ----- */
+function rankFor(points) {
+    if (!lbOnline || points <= 0) {
+        return 0;
+    }
+
+    var better = topList.filter(function (entry) {
+        return entry.score >= points;
+    }).length;
+
+    return better < 10 ? better + 1 : 0;
+}
+
+/* ----- show the NEW HIGH SCORE box ----- */
+function askForName(rank) {
+    document.getElementById('name-rank').textContent = 'RANK #' + rank + ' · ' + score + ' PTS';
+    nameError.hidden = true;
+    nameInput.value = myName;
+    message.hidden = true;
+    nameBox.hidden = false;
+    nameInput.focus();
+}
+
+/*only A-Z, 0-9 and _ while typing (shown in capitals)*/
+nameInput.addEventListener('input', function () {
+    nameInput.value = nameInput.value.toUpperCase().replace(/[^A-Z0-9_]/g, '').slice(0, 12);
+});
+
+/* ----- ✕ = skip, don't save ----- */
+document.getElementById('name-close').addEventListener('click', showGameOver);
+
+/* ----- Save to board ----- */
+nameForm.addEventListener('submit', function (e) {
+    e.preventDefault(); /*stay on this page*/
+
+    var name = nameInput.value || 'PLAYER';
+    var saveBtn = document.getElementById('name-save');
+    saveBtn.disabled = true;
+
+    fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, score: score })
+    })
+        .then(function (response) {
+            return response.json().then(function (data) {
+                if (!response.ok) throw new Error(data.error || 'Could not save.');
+                return data;
+            });
+        })
+        .then(function (data) {
+            myName = name;
+            drawLeaderboard(data.top, data.resetsAt);
+            lbBox.classList.add('open');   /*phone: show all 10 so you can see your name*/
+            showGameOver();
+        })
+        .catch(function (err) {
+            nameError.textContent = err.message;  /*e.g. "Please use another name"*/
+            nameError.hidden = false;
+        })
+        .then(function () {
+            saveBtn.disabled = false;
+        });
+});
+
+/* ----- phone: SHOW TOP 10 / SHOW TOP 3 ----- */
+var lbToggle = document.getElementById('lb-toggle');
+
+lbToggle.addEventListener('click', function () {
+    var isOpen = lbBox.classList.toggle('open');
+    lbToggle.textContent = isOpen ? 'SHOW TOP 3 ▲' : 'SHOW TOP 10 ▼';
+    lbToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 });

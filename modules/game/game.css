@@ -1,59 +1,244 @@
 /* =====================================================================
    game.css - only for game.html (Bug Snake)
+   1. Neon colour (changes with Hero / Villain mode)
+   2. Layout: leaderboard · cabinet · controls
+   3. Arcade leaderboard
+   4. Arcade cabinet + board
+   5. Start / game over message
+   6. New high score name box
+   7. Controls: cola timer, 2 × 2 pad, how to play
+   8. Phone
    ===================================================================== */
 
 
-/* ===================== LAYOUT: board left, side right ===================== */
+/* ===================== 1. NEON COLOUR ===================== */
 
+.game {
+    --neon:#5EC4CD;                         /*hero: sea blue glow*/
+    --neon-soft:rgba(94, 196, 205, 0.6);
+    --arcade-font:'Press Start 2P', var(--font-pixel);
+}
+
+[data-theme="dark"] .game {
+    --neon:#ff3b3b;                         /*villain: blood red glow*/
+    --neon-soft:rgba(255, 59, 59, 0.6);
+}
+
+
+/* ===================== 2. LAYOUT ===================== */
+
+/*laptop: three columns, all centred on one line*/
 .game {
     flex-grow:1;
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:56px;
+    flex-wrap:wrap;          /*on a narrow laptop the controls move under the board*/
+    gap:30px;
 }
 
-.board-frame {
-    width:min(600px, 100%);
+.lb {
+    width:300px;
     flex-shrink:0;
-    padding:10px;
+}
+
+.cabinet {
+    flex:0 1 520px;
+    min-width:340px;
 }
 
 .game-side {
-    width:320px;
+    width:240px;
     display:flex;
     flex-direction:column;
-    gap:18px;
+    gap:16px;
 }
 
 
-/* ===================== BOARD ===================== */
+/* ===================== 3. ARCADE LEADERBOARD ===================== */
 
-/*holds the board + the start/game over message on top of it*/
-.board-wrap {
+.lb {
+    padding:18px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    font-family:var(--arcade-font);
+    color:#e8e8ff;
+    background:#08080d;                     /*always dark, like a real arcade screen*/
+    border:3px solid var(--neon);
+    border-radius:10px;
+    box-shadow:0 0 0 3px #000000, 0 0 24px var(--neon-soft), inset 0 0 18px var(--neon-soft);
+}
+
+.lb-title {
+    margin:0;
+    text-align:center;
+    font-size:15px;
+    line-height:1.4;
+    color:#ffffff;
+    text-shadow:0 0 6px var(--neon), 0 0 14px var(--neon);
+}
+
+/*"THIS WEEK · RESETS IN 3D 14H" (blinks)*/
+.lb-week {
+    margin:0;
+    text-align:center;
+    font-size:9px;
+    line-height:1.6;
+    color:#ffd84a;
+    animation:blink 1.2s steps(2) infinite;
+}
+
+.lb-list {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+/*one row: rank · name · score*/
+.lb-row {
+    display:grid;
+    grid-template-columns:34px 1fr auto;
+    gap:8px;
+    align-items:center;
+    padding:7px 8px;
+    font-size:11px;
+    border-bottom:1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.lb-name {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+/*gold, silver, bronze for 1st, 2nd, 3rd*/
+.lb-row:nth-child(1) .lb-rank, .lb-row:nth-child(1) .lb-score { color:#ffd84a; text-shadow:0 0 6px #ffd84a; }
+.lb-row:nth-child(2) .lb-rank, .lb-row:nth-child(2) .lb-score { color:#d9d9e6; text-shadow:0 0 6px #d9d9e6; }
+.lb-row:nth-child(3) .lb-rank, .lb-row:nth-child(3) .lb-score { color:#e08a4a; text-shadow:0 0 6px #e08a4a; }
+
+/*your own row after you save (game.js adds "me")*/
+.lb-row.me {
+    background:rgba(255, 255, 255, 0.08);
+    outline:2px solid var(--neon);
+}
+
+/*message when the board can't load*/
+.lb-status {
+    margin:0;
+    text-align:center;
+    font-size:9px;
+    line-height:1.7;
+    color:#aaaaaa;
+}
+
+/*phone only (see part 8)*/
+.lb-toggle {
+    display:none;
+    align-self:center;
+    min-height:44px;
+    padding:0 14px;
+    font-family:var(--arcade-font);
+    font-size:10px;
+    color:#ffffff;
+    background:#000000;
+    border:2px solid var(--neon);
+    cursor:pointer;
+}
+
+
+/* ===================== 4. ARCADE CABINET + BOARD ===================== */
+
+.cabinet {
     position:relative;
+    margin-top:14px;                         /*room for the marquee sign*/
+    padding:20px 18px 18px;
+    background:#1b1b22;
+    border:4px solid #000000;
+    border-radius:14px;
+    box-shadow:inset 0 0 0 4px var(--neon), 0 0 22px var(--neon-soft), 0 10px 0 #000000;
 }
 
-/*15 × 15 squares, always a perfect square*/
+/*screws in the 4 corners*/
+.bolt {
+    position:absolute;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#777777;
+    box-shadow:inset -2px -2px 0 #444444;
+}
+
+.bolt-tl { top:8px;    left:8px; }
+.bolt-tr { top:8px;    right:8px; }
+.bolt-bl { bottom:8px; left:8px; }
+.bolt-br { bottom:8px; right:8px; }
+
+/*glowing sign on top*/
+.marquee {
+    position:absolute;
+    z-index:3;
+    top:-22px;
+    left:50%;
+    transform:translateX(-50%);
+    margin:0;
+    padding:6px 16px;
+    white-space:nowrap;
+    font-family:var(--arcade-font);
+    font-size:11px;
+    color:#ffffff;
+    background:#000000;
+    border:3px solid var(--neon);
+    box-shadow:0 0 14px var(--neon-soft);
+    text-shadow:0 0 6px var(--neon);
+}
+
+/*SCORE · BEST inside the cabinet*/
+.score-strip {
+    display:flex;
+    justify-content:space-between;
+    padding:4px 4px 10px;
+    font-family:var(--arcade-font);
+    font-size:11px;
+    color:#ffffff;
+}
+
+.score-strip b {
+    font-weight:normal;
+    color:#ffd84a;
+}
+
+/*the screen: holds the board, the messages and the scanlines*/
+.screen-glass {
+    position:relative;
+    overflow:hidden;
+    border:3px solid #000000;
+    border-radius:6px;
+    box-shadow:0 0 0 2px #444444;
+}
+
+/*faint TV lines*/
+.scanlines {
+    position:absolute;
+    inset:0;
+    z-index:4;
+    pointer-events:none;
+    background:repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 0 2px, transparent 2px 4px);
+}
+
+/* ----- the board: 15 × 15 squares, always a perfect square ----- */
 .board {
     display:grid;
     grid-template-columns:repeat(15, 1fr);
     aspect-ratio:1 / 1;
     background:#fffaf0;
-    touch-action:none;          /*swiping on the board always moves the snake, not the page*/
-}
-
-/*while playing: swiping anywhere on the game area moves the snake, not the page
-  (game.js adds/removes the class "playing")*/
-.game.playing {
-    touch-action:none;
+    touch-action:none;          /*swiping on the board moves the snake, not the page*/
 }
 
 [data-theme="dark"] .board {
     background:#0b0303;
 }
 
-/*one square: thin grid line*/
 .cell {
     border:1px solid rgba(48, 0, 0, 0.08);
 }
@@ -61,8 +246,6 @@
 [data-theme="dark"] .cell {
     border-color:rgba(204, 0, 0, 0.15);
 }
-
-/* ----- what can be on a square (game.js adds these classes) ----- */
 
 /*HEAD = you (your photo)*/
 .cell.head {
@@ -91,13 +274,19 @@
     50% { transform:scale(1.15); }
 }
 
+/*while playing: swiping anywhere on the game moves the snake, not the page
+  (game.js adds/removes the class "playing")*/
+.game.playing {
+    touch-action:none;
+}
 
-/* ===================== START / GAME OVER MESSAGE ===================== */
+
+/* ===================== 5. START / GAME OVER MESSAGE ===================== */
 
 .board-message {
     position:absolute;
     inset:0;
-    z-index:2;
+    z-index:5;
     padding:20px;
     display:flex;
     flex-direction:column;
@@ -105,22 +294,16 @@
     justify-content:center;
     gap:14px;
     text-align:center;
-    background:rgba(255, 250, 240, 0.94);
-}
-
-[data-theme="dark"] .board-message {
-    background:rgba(18, 6, 6, 0.92);
-}
-
-.board-message[hidden] {
-    display:none;
+    color:#ffffff;
+    background:rgba(8, 8, 13, 0.9);
 }
 
 .message-title {
     margin:0;
-    font-family:var(--font-pixel);
-    font-size:28px;
-    font-weight:600;
+    font-family:var(--arcade-font);
+    font-size:18px;
+    line-height:1.5;
+    text-shadow:0 0 10px var(--neon);
 }
 
 .message-text {
@@ -131,43 +314,116 @@
 }
 
 
-/* ===================== SIDE: SCORES ===================== */
+/* ===================== 6. NEW HIGH SCORE NAME BOX ===================== */
 
-.scores {
-    display:grid;
-    grid-template-columns:repeat(2, minmax(0, 1fr));
-    gap:12px;
+.name-box {
+    position:absolute;
+    inset:0;
+    z-index:6;
+    padding:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(8, 8, 13, 0.94);
 }
 
-.score-box {
-    padding:10px 14px;
-    font-family:var(--font-pixel);
+.name-card {
+    position:relative;
+    width:100%;
+    max-width:340px;
+    padding:28px 20px 22px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    text-align:center;
+    background:#08080d;
+    border:3px solid var(--neon);
+    border-radius:10px;
+    box-shadow:0 0 24px var(--neon-soft);
 }
 
-.score-label {
+/*✕ in the corner = skip*/
+.name-close {
+    position:absolute;
+    z-index:2;                  /*always on top, so the title can't cover it*/
+    top:10px;
+    right:10px;
+    width:44px;
+    height:44px;
+    padding:0;
+    font-family:var(--arcade-font);
+    font-size:14px;
+    color:#ffffff;
+    background:#000000;
+    border:3px solid #888888;
+    cursor:pointer;
+    transition:transform 0.2s, border-color 0.2s;
+}
+
+.name-close:hover,
+.name-close:focus-visible {
+    transform:translateY(-3px);
+    border-color:#ff3b3b;
+    outline:none;
+}
+
+.name-title {
+    margin:0 44px;              /*leaves room for the ✕ button*/
+    font-family:var(--arcade-font);
+    font-size:14px;
+    line-height:1.5;
+    color:#ffd84a;
+    animation:blink 1.2s steps(2) infinite;
+}
+
+.name-rank {
     margin:0;
-    font-size:13px;
+    font-family:var(--arcade-font);
+    font-size:11px;
+    line-height:1.6;
+    color:#ffffff;
 }
 
-.score-number {
+.name-label {
+    font-family:var(--arcade-font);
+    font-size:10px;
+    color:#cccccc;
+    text-align:left;
+}
+
+.name-input {
+    width:100%;
+    height:48px;
+    padding:0 12px;
+    font-family:var(--arcade-font);
+    font-size:14px;
+    text-transform:uppercase;
+    color:#ffffff;
+    background:#000000;
+    border:3px solid var(--neon);
+    outline:none;
+}
+
+.name-input:focus {
+    box-shadow:0 0 14px var(--neon-soft);
+}
+
+.name-error {
     margin:0;
-    font-size:26px;
-    font-weight:600;
+    font-size:14px;
+    color:#ff8a8a;
 }
 
 
-/* ===================== SIDE: COLA TIMER ===================== */
+/* ===================== 7. CONTROLS ===================== */
 
+/* ----- cola timer ----- */
 .cola-box {
     padding:10px 14px;
     display:flex;
     flex-direction:column;
     gap:6px;
     font-family:var(--font-pixel);
-}
-
-.cola-box[hidden] {
-    display:none;
 }
 
 .cola-title {
@@ -189,36 +445,20 @@
     background:#cc0000;
 }
 
-
-/* ===================== SIDE: ARROW BUTTONS ===================== */
-
-/*   .  ▲  .
-     ◀  ▼  ▶   */
+/* ----- 2 × 2 arrow buttons ----- */
 .pad {
     display:grid;
-    grid-template-columns:repeat(3, 64px);
-    grid-template-areas:
-        ".    up   ."
-        "left down right";
-    gap:10px;
-    justify-content:center;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:12px;
 }
 
 .pad-btn {
-    width:64px;
     height:64px;
-    padding:0;
-    font-size:28px;
+    padding:0 8px;
+    font-size:18px;
 }
 
-.pad-up    { grid-area:up; }
-.pad-left  { grid-area:left; }
-.pad-down  { grid-area:down; }
-.pad-right { grid-area:right; }
-
-
-/* ===================== SIDE: HOW TO PLAY ===================== */
-
+/* ----- how to play ----- */
 .how-to {
     padding:12px 16px;
     font-size:15px;
@@ -231,27 +471,47 @@
 }
 
 
-/* ===================== PHONE / SMALL SCREEN ===================== */
+/* ===================== 8. PHONE / SMALL SCREEN ===================== */
 
 @media (max-width: 900px) {
 
-    /*board on top, buttons under it*/
+    /*leaderboard on top, then the cabinet, then the buttons (one column, no wrapping)*/
     .game {
         flex-direction:column;
-        gap:24px;
+        flex-wrap:nowrap;
+        align-items:stretch;
+        gap:26px;
     }
 
+    .lb,
     .game-side {
         width:100%;
-        max-width:420px;
     }
 
-    .pad {
-        grid-template-columns:repeat(3, 72px);
+    .cabinet {
+        flex:none;
+        width:100%;
+        max-width:520px;            /*tablets: don't let the board get huge*/
+        min-width:0;
+        margin-left:auto;
+        margin-right:auto;
+        padding:18px 10px 12px;
+    }
+
+    /*phone: only the top 3 until "SHOW TOP 10" is pressed (game.js adds "open")*/
+    .lb-toggle {
+        display:block;
+    }
+
+    .lb:not(.open) .lb-row:nth-child(n+4) {
+        display:none;
     }
 
     .pad-btn {
-        width:72px;
         height:72px;
+    }
+
+    .how-to {
+        display:none; /*the start screen already explains it*/
     }
 }
