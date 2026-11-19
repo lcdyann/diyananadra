@@ -32,7 +32,11 @@ var REDIS_TOKEN = findKey(['KV_REST_API_TOKEN', 'REDIS_REST_TOKEN']);
   and gives back their results in the same order*/
 async function redis(commands) {
     if (!REDIS_URL || !REDIS_TOKEN) {
-        throw new Error('Database is not connected yet (no Upstash keys in this Vercel project).');
+        /*list only the NAMES of keys that look like database keys (never their values)*/
+        var seen = Object.keys(process.env).filter(function (name) {
+            return /KV|REDIS|UPSTASH|STORAGE/.test(name);
+        });
+        throw new Error('Database keys not found. Keys this project has: ' + (seen.join(', ') || 'none'));
     }
 
     var response = await fetch(REDIS_URL + '/pipeline', {
@@ -45,7 +49,7 @@ async function redis(commands) {
     });
 
     if (!response.ok) {
-        throw new Error('Database error ' + response.status);
+        throw new Error('Database answered ' + response.status + ' (401 = wrong key, 404 = wrong address)');
     }
 
     var results = await response.json();

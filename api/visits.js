@@ -35,6 +35,7 @@ module.exports = async function (req, res) {
         return res.status(405).json({ error: 'Use GET or POST.' });
 
     } catch (err) {
-        return res.status(500).json({ error: 'Counter is not available right now.' });
+        /*"reason" says what went wrong (never the database keys), to help fix problems*/
+        return res.status(500).json({ error: 'Counter is not available right now.', reason: err.message });
     }
 };
