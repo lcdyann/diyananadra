@@ -51,7 +51,8 @@ var SKILL_MACHINES = [
         skills: [
             { name: 'MySQL', icon: 'devicon-mysql-original colored' },
             { name: 'Git', icon: 'devicon-git-plain colored' },
-            { name: 'GitHub', icon: 'devicon-github-original' }
+            { name: 'GitHub', icon: 'devicon-github-original' },
+            { name: 'Figma', icon: 'devicon-figma-plain colored' }
         ]
     }
 
