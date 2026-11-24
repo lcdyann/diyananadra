@@ -6,7 +6,10 @@
    POST /api/yna  { do: 'care', what, name }      -> visitor pats / listens / feeds / naps Yna
    POST /api/yna  { do: 'score', game, name, score } -> visitor score vs Yna's boss score
    POST /api/yna  { do: 'suggest', song, name }   -> visitor suggests a song
-   POST /api/yna  { do: 'owner', key, house, shows } -> ONLY the Yna's House app (needs the owner key)
+   POST /api/yna  { do: 'owner', key, house, shows } -> ONLY the owner (Android app, or "My" on yna.html)
+   POST /api/yna  { do: 'owner-check', key }       -> is the owner key right? (+ song suggestions)
+   POST /api/yna  { do: 'owner-place', key, lat, lng } -> where to check the weather (kept private)
+   POST /api/yna  { do: 'owner-boss', key, game, score } -> Yna's owner played on the web: new boss score?
 
    SETTINGS (Vercel -> project -> Settings -> Environment Variables):
      YNA_OWNER_KEY  = any long secret words (the same words go in the app, links/MyLinks.kt -> OWNER_KEY)
@@ -18,6 +21,8 @@
      yna:care     - last 20 visitor care actions ("Someone patted Yna")
      yna:suggest  - last 50 song suggestions (only the app can read them)
      yna:scores:<game> - visitors' best scores per game
+     yna:place    - rough weather location (2 decimals, ~1 km). Never sent to visitors.
+     yna:weather  - weather from Open-Meteo, kept 30 minutes
    ===================================================================== */
 
 var db = require('./_redis.js');
@@ -114,6 +119,71 @@ async function topScores(game) {
 }
 
 
+/* ===================== WEATHER (by the server, so no phone is needed) ===================== */
+
+/*WMO weather code (Open-Meteo) -> simple kind*/
+function weatherKind(code) {
+    if (code <= 1) return 'clear';
+    if (code <= 3) return 'cloudy';
+    if (code === 45 || code === 48) return 'fog';
+    if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return 'rain';
+    if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
+    if (code >= 95) return 'storm';
+    return 'cloudy';
+}
+
+/*{ kind, temp, night } or null (no place set yet / weather site down)*/
+async function serverWeather() {
+    try {
+        var saved = await db.redis([['GET', 'yna:weather'], ['GET', 'yna:place']]);
+        if (saved[0]) return JSON.parse(saved[0]);
+        var place = parse(saved[1], null);
+        if (!place) return null;
+
+        var response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + place.lat +
+            '&longitude=' + place.lng + '&current=temperature_2m,weather_code,is_day&timezone=auto');
+        if (!response.ok) return null;
+        var current = (await response.json()).current || {};
+        var weather = {
+            kind: weatherKind(Number(current.weather_code)),
+            temp: Math.round(Number(current.temperature_2m) || 0),
+            night: Number(current.is_day) === 0
+        };
+        await db.redis([['SET', 'yna:weather', JSON.stringify(weather), 'EX', 1800]]);
+        return weather;
+    } catch (e) {
+        return null;
+    }
+}
+
+/*keep the BEST of two boss score lists (app + web), game by game*/
+function mergeBoss(oldBoss, newBoss) {
+    var out = {};
+    Object.keys(GAMES).forEach(function (game) {
+        var a = Number((oldBoss || {})[game]) || 0;
+        var b = Number((newBoss || {})[game]) || 0;
+        if (a === 0 || b === 0) {
+            out[game] = a || b;
+        } else {
+            out[game] = GAMES[game].lowerIsBetter ? Math.min(a, b) : Math.max(a, b);
+        }
+    });
+    return out;
+}
+
+function isOwner(body) {
+    return !!process.env.YNA_OWNER_KEY && body.key === process.env.YNA_OWNER_KEY;
+}
+
+async function ownerExtras() {
+    var extra = await db.redis([['LRANGE', 'yna:care', 0, 9], ['LRANGE', 'yna:suggest', 0, 19]]);
+    return {
+        care: (extra[0] || []).map(function (x) { return parse(x, null); }).filter(Boolean),
+        suggestions: (extra[1] || []).map(function (x) { return parse(x, null); }).filter(Boolean)
+    };
+}
+
+
 /* ===================== GET: everything for the visitor page ===================== */
 
 async function readHouse() {
@@ -146,7 +216,7 @@ async function readHouse() {
         foodMood: house.foodMood || '',
         foodMoodBefore: house.foodMoodBefore || '',
         song: house.song || null,
-        weather: house.weather || null,
+        weather: (await serverWeather()) || house.weather || null,
         boss: house.boss || {},
         updatedAt: house.updatedAt,
         care: care,
@@ -222,17 +292,57 @@ module.exports = async function (req, res) {
             return res.status(200).json({ ok: true });
         }
 
-        /* ---------- owner app: save Yna's house ---------- */
+        /* ---------- owner (web "My"): is the key right? ---------- */
+        if (body.do === 'owner-check') {
+            if (!(await db.allowed(req, 'yna-owner-check', 10))) {
+                return res.status(429).json({ error: 'Too many tries. Wait a minute.' });
+            }
+            if (!isOwner(body)) return res.status(401).json({ error: 'Wrong owner key.' });
+            return res.status(200).json(Object.assign({ ok: true }, await ownerExtras()));
+        }
+
+        /* ---------- owner: where to check the weather (rounded, private) ---------- */
+        if (body.do === 'owner-place') {
+            if (!isOwner(body)) return res.status(401).json({ error: 'Wrong owner key.' });
+            var lat = Math.round(Number(body.lat) * 100) / 100;
+            var lng = Math.round(Number(body.lng) * 100) / 100;
+            if (!isFinite(lat) || !isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+                return res.status(400).json({ error: 'That place is not right.' });
+            }
+            await db.redis([['SET', 'yna:place', JSON.stringify({ lat: lat, lng: lng })], ['DEL', 'yna:weather']]);
+            return res.status(200).json({ weather: await serverWeather() });
+        }
+
+        /* ---------- owner played a game on the web: maybe a new boss score ---------- */
+        if (body.do === 'owner-boss') {
+            if (!isOwner(body)) return res.status(401).json({ error: 'Wrong owner key.' });
+            var bossRule = GAMES[body.game];
+            var bossScore = Number(body.score);
+            if (!bossRule || !Number.isInteger(bossScore) || bossScore <= 0 || bossScore > bossRule.max) {
+                return res.status(400).json({ error: 'That score is not possible.' });
+            }
+            var saved = parse((await db.redis([['GET', 'yna:house']]))[0], null) ||
+                { mood: 'WATCHING', happiness: 70, tummy: 60, rest: 60, updatedAt: Date.now() };
+            var newBoss = {};
+            newBoss[body.game] = bossScore;
+            saved.boss = mergeBoss(saved.boss, newBoss);
+            await db.redis([['SET', 'yna:house', JSON.stringify(saved)]]);
+            return res.status(200).json({ boss: saved.boss });
+        }
+
+        /* ---------- owner (app or web "My"): save Yna's house ---------- */
         if (body.do === 'owner') {
-            var secret = process.env.YNA_OWNER_KEY;
-            if (!secret || body.key !== secret) {
+            if (!isOwner(body)) {
                 return res.status(401).json({ error: 'Wrong owner key.' });
             }
             var h = body.house || {};
 
-            /*take the visitors' care so far, and add it to the meters the app sent*/
-            var taken = await db.redis([['HGETALL', 'yna:boost'], ['DEL', 'yna:boost']]);
-            var boost = hashToObject(taken[0]);
+            /*take the visitors' care so far.
+              The app adds it to the meters it sends. The web page sends meters it read from GET,
+              which ALREADY include the care (metersIncludeBoost), so then it is only cleared.*/
+            var taken = await db.redis([['HGETALL', 'yna:boost'], ['DEL', 'yna:boost'], ['GET', 'yna:house']]);
+            var boost = body.metersIncludeBoost ? {} : hashToObject(taken[0]);
+            var before = parse(taken[2], {}) || {};
 
             var house = {
                 mood: String(h.mood || 'WATCHING'),
@@ -247,7 +357,7 @@ module.exports = async function (req, res) {
                     art: typeof h.song.art === 'string' && h.song.art.length < 40000 ? h.song.art : '',
                     playing: !!h.song.playing
                 } : null,
-                boss: h.boss || {},
+                boss: mergeBoss(before.boss, h.boss),      /*best of app + web*/
                 /*weather near Yna: only the kind + temperature, never the location*/
                 weather: h.weather ? {
                     kind: cleanText(h.weather.kind, 12),          /*clear, cloudy, rain, storm, fog, snow*/
@@ -274,11 +384,11 @@ module.exports = async function (req, res) {
             await db.redis(cmds2);
 
             /*give back: the care that was added, recent care + song suggestions (owner only), Spotify*/
-            var extra = await db.redis([['LRANGE', 'yna:care', 0, 9], ['LRANGE', 'yna:suggest', 0, 19]]);
+            var extras = await ownerExtras();
             return res.status(200).json({
                 boost: boost,
-                care: (extra[0] || []).map(function (x) { return parse(x, null); }).filter(Boolean),
-                suggestions: (extra[1] || []).map(function (x) { return parse(x, null); }).filter(Boolean),
+                care: extras.care,
+                suggestions: extras.suggestions,
                 spotify: await spotify.read()
             });
         }

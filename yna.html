@@ -12,6 +12,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Yna's House</title>
 
+        <!-- iPhone: "Add to Home Screen" opens this page like an app, with Yna as the icon -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-title" content="Yna's House">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="theme-color" content="#FFC2DE">
+        <link rel="apple-touch-icon" href="assets/yna/icon-180.png">
+        <link rel="icon" href="assets/yna/icon-180.png">
+
         <!-- fonts: Fredoka (Yna's cute house), plus the portfolio fonts for the top bar -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,6 +75,8 @@
                             <div class="tank tank-rest" id="tank-rest" title="Rest (me time)">
                                 <span class="liquid"></span><span class="tank-icon">🌙</span>
                             </div>
+                            <!-- only Yna's owner sees this (after signing in once on this phone) -->
+                            <button type="button" class="my-btn" id="my-btn" hidden>👑<span>My</span></button>
                         </div>
                     </div>
 
@@ -139,6 +150,9 @@
                         <button type="button" class="hall" data-room="7"><img src="assets/yna/rooms/room_bedroom.webp" alt=""><span>Bedroom</span></button>
                         <button type="button" class="hall" data-room="8"><img src="assets/yna/rooms/room_balcony.webp" alt=""><span>Balcony</span></button>
                     </nav>
+
+                    <!-- small sign-in for Yna's owner (visitors can ignore it) -->
+                    <button type="button" class="owner-link" id="owner-link">🔑 Yna's owner</button>
                 </section>
 
 
@@ -173,8 +187,8 @@
                                 <tr><td>🔢 Daily Sudoku</td><td id="boss-sudoku">—</td></tr>
                             </tbody>
                         </table>
-                        <p class="card-note">These games live in the Yna's House app. While you're here, try Bug Snake!</p>
-                        <a class="btn yna-btn" href="game.html">🐛 Play Bug Snake</a>
+                        <p class="card-note">Think you can beat Yna? Play right here, on your phone or laptop!</p>
+                        <a class="btn yna-btn" href="yna-games.html">🕹️ Play Yna's games</a>
                     </article>
 
                     <!-- THEATER: watch list with posters -->
@@ -232,6 +246,132 @@
         </main>
 
 
+        <!-- ================= OWNER: SIGN IN (once per phone) ================= -->
+        <dialog class="yna-dialog" id="owner-login">
+            <form method="dialog" class="dialog-box" id="owner-login-form">
+                <h2>🔑 Yna's owner</h2>
+                <p class="card-note">Type your owner key (the same words as YNA_OWNER_KEY in Vercel). This phone remembers it.</p>
+                <input type="password" id="owner-key" autocomplete="current-password" placeholder="owner key" required>
+                <p class="card-note" id="owner-login-note"></p>
+                <div class="dialog-row">
+                    <button type="button" class="btn btn-ghost yna-btn" id="owner-login-cancel">Cancel</button>
+                    <button type="submit" class="btn yna-btn">Sign in</button>
+                </div>
+            </form>
+        </dialog>
+
+
+        <!-- ================= OWNER: MY CORNER =================
+             mood · levels · craving · watch list · weather · from visitors
+             What the buttons do is in modules/yna/yna-owner.js -->
+        <dialog class="yna-dialog" id="my-sheet">
+            <div class="dialog-box my-box">
+                <div class="my-head">
+                    <h2>👑 My corner</h2>
+                    <button type="button" class="my-close" id="my-close" aria-label="Close">✕</button>
+                </div>
+                <p class="my-status" id="my-status"></p>
+
+                <!-- 1. what am I doing now = which room Yna is in -->
+                <h3>🏠 What am I doing now?</h3>
+                <div class="my-grid" id="my-moods">
+                    <button type="button" class="my-chip" data-mood="WATCHING">🎬 Watching</button>
+                    <button type="button" class="my-chip" data-mood="CODING">💻 Busy coding</button>
+                    <button type="button" class="my-chip" data-mood="GAMING">🎮 Gaming</button>
+                    <button type="button" class="my-chip" data-mood="EATING">🍽️ Eating</button>
+                    <button type="button" class="my-chip" data-mood="STRESS_EATING">🍟 Stress eating</button>
+                    <button type="button" class="my-chip" data-mood="MUSIC">🎧 Music</button>
+                    <button type="button" class="my-chip" data-mood="SLEEPING">😴 Sleeping</button>
+                    <button type="button" class="my-chip" data-mood="CHILLING">🌿 Chilling</button>
+                    <button type="button" class="my-chip" data-mood="OUT">🚶 Going out</button>
+                </div>
+
+                <!-- 2. how am I really feeling -->
+                <h3>❤️ How am I really feeling?</h3>
+                <label class="my-slider">❤️ Happiness <input type="range" id="lv-happy" min="0" max="100"><output id="lv-happy-out"></output></label>
+                <label class="my-slider">🍟 Tummy <input type="range" id="lv-tummy" min="0" max="100"><output id="lv-tummy-out"></output></label>
+                <label class="my-slider">🌙 Rest <input type="range" id="lv-rest" min="0" max="100"><output id="lv-rest-out"></output></label>
+                <button type="button" class="btn yna-btn my-save" id="save-levels">Save my levels</button>
+
+                <!-- 3. craving (pick 1 or 2) -->
+                <h3>🍟 What am I craving?</h3>
+                <div class="my-grid" id="my-foods">
+                    <button type="button" class="my-chip" data-food="I want ricee">🍚 I want ricee</button>
+                    <button type="button" class="my-chip" data-food="Gimme soupy!">🍲 Gimme soupy!</button>
+                    <button type="button" class="my-chip" data-food="Flavour bomb pls">🍟 Flavour bomb</button>
+                    <button type="button" class="my-chip" data-food="Feed me meat!">🍗 Feed me meat!</button>
+                    <button type="button" class="my-chip" data-food="Make it SPICY">🌶️ Make it SPICY</button>
+                    <button type="button" class="my-chip" data-food="Just a lil starter">🥟 Lil starter</button>
+                    <button type="button" class="my-chip" data-food="Sweet tooth attack">🍦 Sweet tooth</button>
+                    <button type="button" class="my-chip" data-food="Need a boost">☕ Need a boost</button>
+                    <button type="button" class="my-chip" data-food="Stress eating time">🍕 Stress eating</button>
+                    <button type="button" class="my-chip" data-food="Midnight munchies">🌙 Midnight munchies</button>
+                </div>
+                <button type="button" class="btn yna-btn my-save" id="save-craving">Save my craving</button>
+
+                <!-- 4. watch list -->
+                <h3>📺 My watch list</h3>
+                <ul class="my-shows" id="my-shows"></ul>
+                <form class="my-add" id="add-show-form">
+                    <input type="text" id="add-title" maxlength="80" placeholder="Title, e.g. Kaiju No. 8" required>
+                    <div class="my-add-row">
+                        <select id="add-kind">
+                            <option value="ANIME">🎌 Anime</option>
+                            <option value="CDRAMA">🏮 C-drama</option>
+                            <option value="OTHER">🎬 Other</option>
+                        </select>
+                        <select id="add-reaction">
+                            <option value="LAUGH">😂 Laughing</option>
+                            <option value="CRY">😭 Crying</option>
+                            <option value="SHOCK">😱 Shocked</option>
+                            <option value="LOVE">😍 Loving it</option>
+                        </select>
+                        <select id="add-status">
+                            <option value="NOW">Now watching</option>
+                            <option value="RECENT">Recent</option>
+                            <option value="FAVOURITE">Favourite</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn yna-btn">+ Add (poster found automatically)</button>
+                </form>
+                <!-- hidden picker for "choose a poster from my photos" -->
+                <input type="file" id="poster-file" accept="image/*" hidden>
+
+                <!-- 5. weather -->
+                <h3>🌦️ Weather</h3>
+                <p class="card-note" id="weather-note">Weather updates by itself where you set it. Only "rainy / 27°" is shown — never the place.</p>
+                <button type="button" class="btn btn-ghost yna-btn" id="set-place">📍 Use my location for weather</button>
+
+                <!-- 6. from visitors -->
+                <h3>💌 From visitors</h3>
+                <ul class="care-log" id="my-care"></ul>
+                <ul class="care-log" id="my-suggest"></ul>
+                <p class="card-note" id="my-empty">No visitors yet 🥺</p>
+
+                <!-- 7. games: signed in here = your scores become the boss scores -->
+                <h3>🕹️ My games</h3>
+                <p class="card-note">Your best scores become Yna's boss scores for visitors to beat.</p>
+                <a class="btn yna-btn" href="yna-games.html">🕹️ Play games</a>
+
+                <button type="button" class="btn btn-ghost yna-btn" id="sign-out">Sign out on this phone</button>
+            </div>
+        </dialog>
+
+        <!-- one show in My corner -->
+        <template id="tpl-my-show">
+            <li class="my-show">
+                <span class="my-poster"><img src="" alt=""></span>
+                <span class="my-show-text"><b class="my-show-title"></b><small class="my-show-meta"></small></span>
+                <span class="my-show-btns">
+                    <button type="button" data-act="find" title="Find poster">🔎</button>
+                    <button type="button" data-act="photo" title="Poster from my photos">📷</button>
+                    <button type="button" data-act="status" title="Now → Recent → Favourite">🔁</button>
+                    <button type="button" data-act="remove" title="Remove">✕</button>
+                </span>
+            </li>
+        </template>
+
+
         <!-- ===== small pieces yna.js copies for lists ===== -->
 
         <!-- one show (poster + name) -->
@@ -261,5 +401,7 @@
         <script src="modules/shared/shared.js"></script>
         <script src="modules/yna/yna-data.js"></script>
         <script src="modules/yna/yna.js"></script>
+        <!-- only does something for Yna's owner (after signing in) -->
+        <script src="modules/yna/yna-owner.js"></script>
     </body>
 </html>

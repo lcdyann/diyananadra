@@ -160,6 +160,7 @@ function drawRoom() {
     /*bouncing label above the arcade / gachapon / projector / TV*/
     if (room.spot) {
         spotLabel.textContent = room.spot.text;
+        spotLabel.href = room.spot.href || '#room-info';     /*arcade: opens the games page*/
         spotLabel.style.left = pct((room.spot.left + room.spot.right) / 2);
         spotLabel.style.top = pct(room.spot.top - 0.01);
         spotLabel.hidden = false;

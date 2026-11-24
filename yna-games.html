@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<!-- ===== YNA-GAMES.HTML - YNA'S PLAYROOM (the 4 mini games) =====
+     Same games as the Yna's House app: Cloud Jump · Cola Cart · Yna Run · Daily Sudoku
+     - Yna's owner (signed in on yna.html): her score becomes the BOSS SCORE
+     - visitors: try to beat the boss, best scores go on the top 5 board
+
+     Shared parts (choose a game, start / result cards, scores) : modules/yna-games/games-shared.js
+     Each game has its own file                                  : modules/yna-games/<game>.js
+     The look                                                    : modules/yna-games/games.css
+     Open a game straight away with a link, e.g. yna-games.html?game=runner -->
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <title>Yna's Playroom</title>
+
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="theme-color" content="#FFC2DE">
+        <link rel="apple-touch-icon" href="assets/yna/icon-180.png">
+        <link rel="icon" href="assets/yna/icon-180.png">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Fredoka:wght@500;600;700&family=Pixelify+Sans:wght@400;600&display=swap">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+        <link rel="stylesheet" href="modules/shared/shared.css">
+        <link rel="stylesheet" href="modules/yna-games/games.css">
+
+        <script>
+            /*Light and Dark Mode (part 1): pick the theme BEFORE the page shows*/
+            try {
+                var savedTheme = localStorage.getItem('theme');
+                if (savedTheme) {
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {
+            }
+        </script>
+    </head>
+
+    <body>
+
+        <main class="screen games-screen">
+
+            <div data-include="modules/shared/topBar.html" data-back-link="yna.html?room=PLAYROOM" data-back-text="Yna's House" data-title="PLAYROOM"></div>
+
+            <!-- ================= 1. CHOOSE A GAME ================= -->
+            <section class="picker" id="picker" aria-label="Choose a game">
+                <div class="picker-hello">
+                    <img src="assets/yna/poses/yna_game.webp" alt="Yna holding a controller">
+                    <p class="hello-bubble" id="hello-bubble">Pick a game! I'm gonna win this time 😤</p>
+                </div>
+
+                <div class="game-cards">
+                    <button type="button" class="game-card card-cloud" data-game="cloud_jump">
+                        <span class="card-emoji">☁️</span>
+                        <span class="card-name">Cloud Jump</span>
+                        <span class="card-about">Bounce up the clouds</span>
+                        <span class="card-boss">👑 <b id="boss-cloud_jump">—</b></span>
+                    </button>
+                    <button type="button" class="game-card card-cola" data-game="cola_cart">
+                        <span class="card-emoji">🥤</span>
+                        <span class="card-name">Cola Cart</span>
+                        <span class="card-about">Drive over the hills</span>
+                        <span class="card-boss">👑 <b id="boss-cola_cart">—</b></span>
+                    </button>
+                    <button type="button" class="game-card card-run" data-game="runner">
+                        <span class="card-emoji">🏃</span>
+                        <span class="card-name">Yna Run</span>
+                        <span class="card-about">Swipe, jump &amp; slide</span>
+                        <span class="card-boss">👑 <b id="boss-runner">—</b></span>
+                    </button>
+                    <button type="button" class="game-card card-sudoku" data-game="sudoku">
+                        <span class="card-emoji">🔢</span>
+                        <span class="card-name">Daily Sudoku</span>
+                        <span class="card-about">Beat Yna's time</span>
+                        <span class="card-boss">👑 <b id="boss-sudoku">—</b></span>
+                    </button>
+                </div>
+                <p class="picker-note" id="picker-note">👑 = Yna's boss score. Beat it to get on the board!</p>
+            </section>
+
+
+            <!-- ================= 2. THE GAME ================= -->
+            <section class="stage" id="stage" hidden>
+
+                <!-- top: score chips + close -->
+                <div class="stage-top">
+                    <p class="chip" id="hud-1"></p>
+                    <p class="chip" id="hud-2"></p>
+                    <p class="chip" id="hud-3"></p>
+                    <button type="button" class="close-btn" id="close-game" aria-label="Back to the games">✕</button>
+                </div>
+
+                <!-- Cola Cart fuel tank -->
+                <div class="fuel" id="fuel" hidden>
+                    <span class="fuel-icon">⛽</span>
+                    <span class="fuel-bar"><span class="fuel-fill" id="fuel-fill"></span></span>
+                </div>
+
+                <!-- Cloud Jump / Cola Cart / Yna Run are drawn here -->
+                <div class="canvas-box" id="canvas-box">
+                    <canvas id="game-canvas"></canvas>
+                </div>
+
+                <!-- Daily Sudoku: 9 x 9 board + number pad (sudoku.js fills the 81 cells) -->
+                <div class="sudoku" id="sudoku" hidden>
+                    <div class="sudoku-board" id="sudoku-board"></div>
+                    <div class="numpad" id="numpad">
+                        <button type="button" data-num="1">1</button>
+                        <button type="button" data-num="2">2</button>
+                        <button type="button" data-num="3">3</button>
+                        <button type="button" data-num="4">4</button>
+                        <button type="button" data-num="5">5</button>
+                        <button type="button" data-num="6">6</button>
+                        <button type="button" data-num="7">7</button>
+                        <button type="button" data-num="8">8</button>
+                        <button type="button" data-num="9">9</button>
+                        <button type="button" data-num="0" class="erase">⌫</button>
+                    </div>
+                </div>
+
+                <!-- hold buttons: ◀ ▶ (Cloud Jump) or Brake / Gas (Cola Cart). Laptop: arrow keys -->
+                <div class="hold-row" id="hold-row" hidden>
+                    <button type="button" class="hold" id="hold-left">◀</button>
+                    <button type="button" class="hold" id="hold-right">▶</button>
+                </div>
+                <p class="stage-hint" id="stage-hint"></p>
+
+
+                <!-- ----- START card ----- -->
+                <div class="overlay" id="start-card" hidden>
+                    <div class="overlay-box">
+                        <img class="overlay-yna" id="start-pic" src="assets/yna/poses/yna_excited.webp" alt="">
+                        <h2 id="start-title"></h2>
+                        <ul class="tips" id="start-tips"></ul>
+                        <button type="button" class="big-btn btn-yellow" id="start-btn">▶ Start</button>
+                        <button type="button" class="big-btn btn-blue" id="start-back">🏠 Back to the games</button>
+                    </div>
+                </div>
+
+                <!-- ----- RESULT card ----- -->
+                <div class="overlay" id="result-card" hidden>
+                    <div class="overlay-box">
+                        <p class="ribbon" id="result-ribbon" hidden>⭐ NEW BOSS SCORE! ⭐</p>
+                        <img class="overlay-yna" id="result-pic" src="assets/yna/poses/yna_teary.webp" alt="">
+                        <h2 id="result-title"></h2>
+                        <div class="big-score">
+                            <b id="result-score">0</b>
+                            <span id="result-label"></span>
+                        </div>
+                        <div class="stat-row">
+                            <p class="stat">👑 Boss score<b id="result-boss">—</b></p>
+                            <p class="stat" id="result-extra-box" hidden><span id="result-extra"></span></p>
+                        </div>
+
+                        <!-- visitors: name for the top 5 board -->
+                        <form class="name-form" id="name-form" hidden>
+                            <input type="text" id="player-name" maxlength="16" placeholder="Your name for the board">
+                            <button type="submit" class="big-btn btn-pink">Save</button>
+                        </form>
+                        <ol class="top5" id="top5"></ol>
+
+                        <button type="button" class="big-btn btn-yellow" id="again-btn">🔁 Play again</button>
+                        <button type="button" class="big-btn btn-blue" id="result-back">🏠 Back to the games</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <script src="modules/shared/include.js"></script>
+        <script src="modules/shared/shared.js"></script>
+        <!-- 1. shared: choose a game, start/result cards, scores   2. the 4 games -->
+        <script src="modules/yna-games/games-shared.js"></script>
+        <script src="modules/yna-games/cloud-jump.js"></script>
+        <script src="modules/yna-games/cola-cart.js"></script>
+        <script src="modules/yna-games/yna-run.js"></script>
+        <script src="modules/yna-games/sudoku.js"></script>
+        <!-- 3. go! (after all games are loaded) -->
+        <script>startPlayroom();</script>
+    </body>
+</html>

@@ -19,7 +19,7 @@ var YNA_ROOMS = [
       spot: { left: 0.16, top: 0.42, right: 0.36, text: '🎰 craving' } },
     { id: 'PLAYROOM', label: 'Playroom', emoji: '🕹️', art: 'room_playroom',
       mood: 'GAMING', x: 0.58, y: 0.88, size: 0.34,
-      spot: { left: 0.17, top: 0.42, right: 0.38, text: '🕹️ boss scores' } },
+      spot: { left: 0.17, top: 0.42, right: 0.38, text: '🕹️ play games', href: 'yna-games.html' } },
     { id: 'THEATER', label: 'Theater', emoji: '🎬', art: 'room_theater',
       mood: 'WATCHING', x: 0.5, y: 0.79, size: 0.28,
       spot: { left: 0.375, top: 0.345, right: 0.745, text: '📺 watch list' } },

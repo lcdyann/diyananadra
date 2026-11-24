@@ -1,0 +1,584 @@
+/* =====================================================================
+   games.css - YNA'S PLAYROOM (yna-games.html)
+   1. Colours (same pastel as Yna's House, follows light / dark)
+   2. Choose a game (Yna + 2x2 game cards)
+   3. The stage (score chips, canvas, fuel tank, hold buttons)
+   4. Daily Sudoku board + number pad
+   5. Start / result cards
+   6. Phones
+   ===================================================================== */
+
+
+/* ===================== 1. COLOURS ===================== */
+.games-screen {
+    --yna-ink: #3B2B3F;
+    --yna-soft: #7A6380;
+    --yna-pink: #E0569F;
+    --yna-pink-light: #FFC2DE;
+    --yna-pink-deep: #F27BB4;
+    --yna-lilac: #DCCBFF;
+    --yna-yellow: #FFD866;
+    --yna-blue: #8EC5FF;
+    --yna-card: rgba(255, 255, 255, 0.94);
+    font-family: 'Fredoka', sans-serif;
+    color: var(--yna-ink);
+}
+
+[data-theme="dark"] .games-screen {
+    --yna-ink: #FCEFF7;
+    --yna-soft: #D7BFD2;
+    --yna-card: rgba(40, 14, 24, 0.94);
+}
+
+
+/* ===================== 2. CHOOSE A GAME ===================== */
+.picker {
+    width: 100%;
+    max-width: 640px;
+    margin: 12px auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.picker-hello {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.picker-hello img {
+    width: 110px;
+    height: 110px;
+    flex-shrink: 0;
+}
+
+.hello-bubble {
+    margin: 0;
+    padding: 14px 18px;
+    font-size: 18px;
+    font-weight: 600;
+    background: var(--yna-card);
+    border: 3px solid var(--yna-pink-light);
+    border-radius: 22px 22px 22px 6px;
+}
+
+/*2 x 2 cards, each with its own scene colour*/
+.game-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.game-card {
+    position: relative;
+    min-height: 170px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 4px;
+    font-family: inherit;
+    text-align: left;
+    color: #3B2B3F;
+    border: 3px solid #FFFFFF;
+    border-radius: 24px;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 6px 0 rgba(59, 43, 63, 0.18);
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.15s ease;
+}
+
+.game-card:hover,
+.game-card:focus-visible {
+    transform: translateY(-3px);
+}
+
+.game-card:active {
+    transform: translateY(2px);
+}
+
+.card-cloud { background-image: url('../../assets/yna/games/game_sky_day.webp'); }
+.card-cola { background: linear-gradient(#AEDBFF, #FFE3EF 55%, #9EDC9B 56%, #C9A27E); }
+.card-run { background: linear-gradient(#AEDBFF, #FFE0EE 40%, #A8DDA0 41%); }
+.card-sudoku { background: linear-gradient(135deg, #FFF1D6, #DCCBFF); }
+
+.card-emoji {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-size: 38px;
+}
+
+.card-name {
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.card-about {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.card-boss {
+    margin-top: 4px;
+    padding: 3px 10px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 999px;
+}
+
+.picker-note {
+    margin: 0;
+    text-align: center;
+    font-size: 15px;
+    color: var(--yna-soft);
+}
+
+
+/* ===================== 3. THE STAGE ===================== */
+.stage {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    margin: 8px auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.stage-top {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chip {
+    margin: 0;
+    padding: 6px 12px;
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    background: var(--yna-card);
+    border: 2px solid var(--yna-pink-light);
+    border-radius: 999px;
+}
+
+.chip:empty {
+    display: none;
+}
+
+.close-btn {
+    margin-left: auto;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: linear-gradient(#FF9FC8, var(--yna-pink));
+    border: 3px solid #FFFFFF;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.canvas-box {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.canvas-box[hidden] {
+    display: none;
+}
+
+#game-canvas {
+    display: block;
+    border: 4px solid #FFFFFF;
+    border-radius: 24px;
+    box-shadow: 0 8px 0 rgba(59, 43, 63, 0.15);
+    touch-action: none;               /*swipes move Yna, not the page*/
+    background: #BFE6FF;
+}
+
+/*Cola Cart fuel tank*/
+.fuel {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fuel[hidden] {
+    display: none;
+}
+
+.fuel-icon {
+    font-size: 20px;
+}
+
+.fuel-bar {
+    flex: 1;
+    height: 18px;
+    background: var(--yna-card);
+    border: 2px solid var(--yna-pink-light);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.fuel-fill {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(#FF9FB0, #F2657A);
+    border-radius: 999px;
+    transition: width 0.2s linear;
+}
+
+.fuel-fill.low {
+    animation: fuel-blink 0.6s infinite alternate;
+}
+
+@keyframes fuel-blink {
+    to { opacity: 0.35; }
+}
+
+/*hold buttons*/
+.hold-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.hold-row[hidden] {
+    display: none;
+}
+
+.hold {
+    min-height: 64px;
+    font-family: inherit;
+    font-size: 22px;
+    font-weight: 700;
+    color: #3B2B3F;
+    background: linear-gradient(#FFF6C9, var(--yna-yellow));
+    border: 3px solid #FFFFFF;
+    border-radius: 22px;
+    box-shadow: 0 6px 0 rgba(59, 43, 63, 0.18);
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.hold.held {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 rgba(59, 43, 63, 0.18);
+}
+
+.stage-hint {
+    margin: 0;
+    font-size: 14px;
+    color: var(--yna-soft);
+}
+
+
+/* ===================== 4. DAILY SUDOKU ===================== */
+.sudoku {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.sudoku[hidden] {
+    display: none;
+}
+
+.sudoku-board {
+    width: 100%;
+    aspect-ratio: 1;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    background: #FFFFFF;
+    border: 4px solid var(--yna-ink);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.cell {
+    padding: 0;
+    font-family: inherit;
+    font-size: clamp(18px, 5.5vw, 26px);
+    font-weight: 500;
+    color: #4A7BD8;                    /*numbers you typed*/
+    background: #FFFFFF;
+    border: 0;
+    border-right: 1px solid #E5D7E6;
+    border-bottom: 1px solid #E5D7E6;
+    cursor: pointer;
+}
+
+/*thick lines around every 3 x 3 box*/
+.cell:nth-child(9n + 3),
+.cell:nth-child(9n + 6) {
+    border-right: 3px solid var(--yna-ink);
+}
+
+.cell:nth-child(n + 19):nth-child(-n + 27),
+.cell:nth-child(n + 46):nth-child(-n + 54) {
+    border-bottom: 3px solid var(--yna-ink);
+}
+
+.cell.given {
+    font-weight: 700;
+    color: #3B2B3F;
+}
+
+.cell.line { background: #FFF1F8; }
+.cell.same { background: #FFD9EB; }
+.cell.picked { background: var(--yna-pink-light); }
+.cell.wrong { color: #E0465A; }
+
+.numpad {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.numpad button {
+    min-height: 52px;
+    font-family: inherit;
+    font-size: 24px;
+    font-weight: 700;
+    color: #3B2B3F;
+    background: linear-gradient(#FFFFFF, #FFE3EF);
+    border: 3px solid var(--yna-pink-light);
+    border-radius: 16px;
+    cursor: pointer;
+}
+
+.numpad button.erase {
+    background: linear-gradient(#FFF6C9, var(--yna-yellow));
+}
+
+.numpad button.used-up {
+    opacity: 0.3;
+}
+
+
+/* ===================== 5. START / RESULT CARDS ===================== */
+.overlay {
+    position: absolute;
+    inset: 50px 0 0;
+    z-index: 5;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 30px;
+    background: rgba(59, 43, 63, 0.35);
+    border-radius: 24px;
+}
+
+.overlay[hidden] {
+    display: none;
+}
+
+.overlay-box {
+    width: min(92%, 380px);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+    background: var(--yna-card);
+    border: 4px solid var(--yna-pink-light);
+    border-radius: 28px;
+    animation: pop-in 0.25s ease;
+}
+
+@keyframes pop-in {
+    from { transform: scale(0.85); opacity: 0; }
+}
+
+.overlay-yna {
+    width: 120px;
+    height: 120px;
+    margin-top: -10px;
+}
+
+.overlay-box h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.tips {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+    font-size: 15px;
+}
+
+.tips li {
+    padding: 6px 12px;
+    background: rgba(255, 194, 222, 0.3);
+    border-radius: 12px;
+}
+
+.ribbon {
+    margin: 0;
+    padding: 6px 18px;
+    font-weight: 700;
+    color: #3B2B3F;
+    background: linear-gradient(#FFF6C9, var(--yna-yellow));
+    border: 3px solid #FFFFFF;
+    border-radius: 999px;
+    animation: wiggle 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes wiggle {
+    from { transform: rotate(-3deg); }
+    to { transform: rotate(3deg); }
+}
+
+.big-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.big-score b {
+    font-size: 48px;
+    line-height: 1.1;
+    color: var(--yna-pink);
+}
+
+.big-score span {
+    font-size: 14px;
+    color: var(--yna-soft);
+}
+
+.stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.stat {
+    margin: 0;
+    padding: 6px 12px;
+    display: flex;
+    gap: 6px;
+    font-size: 15px;
+    background: rgba(220, 203, 255, 0.45);
+    border-radius: 999px;
+}
+
+.stat[hidden] {
+    display: none;
+}
+
+.name-form {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+}
+
+.name-form[hidden] {
+    display: none;
+}
+
+.name-form input {
+    flex: 1;
+    min-width: 0;
+    padding: 0 12px;
+    font-family: inherit;
+    font-size: 16px;                  /*16px+ so iPhone doesn't zoom in*/
+    color: #3B2B3F;
+    background: #FFFFFF;
+    border: 3px solid var(--yna-pink-light);
+    border-radius: 14px;
+}
+
+.name-form .big-btn {
+    width: auto;
+    padding: 0 18px;
+}
+
+.top5 {
+    margin: 0;
+    padding-left: 26px;
+    width: 100%;
+    text-align: left;
+    font-size: 15px;
+}
+
+.top5:empty {
+    display: none;
+}
+
+.big-btn {
+    width: 100%;
+    min-height: 50px;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 700;
+    color: #3B2B3F;
+    border: 3px solid #FFFFFF;
+    border-radius: 999px;
+    box-shadow: 0 5px 0 rgba(59, 43, 63, 0.18);
+    cursor: pointer;
+}
+
+.big-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 rgba(59, 43, 63, 0.18);
+}
+
+.btn-yellow { background: linear-gradient(#FFF6C9, var(--yna-yellow)); }
+.btn-blue { background: linear-gradient(#E3F1FF, var(--yna-blue)); }
+.btn-pink { background: linear-gradient(#FFE3EF, var(--yna-pink-deep)); }
+
+
+/* ===================== 6. PHONES ===================== */
+@media (max-width: 700px) {
+    .games-screen {
+        padding: 16px 12px 24px;
+    }
+
+    .game-card {
+        min-height: 150px;
+        padding: 12px;
+    }
+
+    .card-name {
+        font-size: 18px;
+    }
+
+    .card-emoji {
+        font-size: 30px;
+    }
+
+    .picker-hello img {
+        width: 84px;
+        height: 84px;
+    }
+
+    .hello-bubble {
+        font-size: 16px;
+    }
+}
