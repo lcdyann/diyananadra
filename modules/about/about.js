@@ -85,11 +85,12 @@ function pullMachine(index) {
     traySkills.innerHTML = '';
     group.skills.forEach(function (skill, i) {
         var chip = copyTemplate('skill-template');
-        var item = chip.querySelector('.skill-chip');
+        var item = chip.querySelector('.skill-ball');
         item.style.setProperty('--machine', group.color);
         item.style.animationDelay = (0.45 + i * 0.04) + 's';
 
         chip.part('name').textContent = skill.name;
+        item.setAttribute('aria-label', skill.name);   /*screen readers say the name too*/
 
         if (skill.icon) {
             chip.part('icon').className = skill.icon;

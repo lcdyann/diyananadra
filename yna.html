@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<!-- ===== YNA.HTML - YNA'S HOUSE (live) =====
+     Visitors see Yna's house exactly as it is in the Yna's House app, right now:
+     which room she's in, her 3 meters, craving, music, shows, weather and boss scores.
+     They can pat / listen / feed / nap Yna, and suggest a song.
+
+     Data comes from /api/yna (api/yna.js). The rooms & poses list is modules/yna/yna-data.js
+     The look is modules/yna/yna.css, what the buttons do is modules/yna/yna.js -->
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Yna's House</title>
+
+        <!-- fonts: Fredoka (Yna's cute house), plus the portfolio fonts for the top bar -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Fredoka:wght@500;600;700&family=Pixelify+Sans:wght@400;600&display=swap">
+
+        <!-- icons for the top bar (sun / moon / back arrow) -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+        <link rel="stylesheet" href="modules/shared/shared.css">
+        <link rel="stylesheet" href="modules/yna/yna.css">
+
+        <script>
+            /*Light and Dark Mode (part 1): pick the theme BEFORE the page shows, so it never flashes*/
+            try {
+                var savedTheme = localStorage.getItem('theme');
+                if (savedTheme) {
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {
+            }
+        </script>
+    </head>
+
+    <body>
+
+        <main class="screen yna-screen">
+
+            <!-- top bar: back button · title · light/dark switch (modules/shared/topBar.html) -->
+            <div data-include="modules/shared/topBar.html" data-back-link="index.html" data-back-text="Menu" data-title="YNA'S HOUSE"></div>
+
+            <!-- shown while loading / when the house can't load -->
+            <p class="yna-status" id="yna-status">Knocking on Yna's door… 🚪</p>
+
+            <div class="yna-layout">
+
+                <!-- ================= LEFT: THE HOUSE ================= -->
+                <section class="house" aria-label="Yna's house">
+
+                    <!-- ----- HUD: room name + 3 meters (like Pou) ----- -->
+                    <div class="hud">
+                        <p class="pill room-name" id="room-name">🏡 Outside</p>
+
+                        <div class="tanks" aria-label="Yna's meters">
+                            <div class="tank tank-happy" id="tank-happy" title="Happiness">
+                                <span class="liquid"></span><span class="tank-icon">❤️</span>
+                            </div>
+                            <div class="tank tank-tummy" id="tank-tummy" title="Tummy">
+                                <span class="liquid"></span><span class="tank-icon">🍟</span>
+                            </div>
+                            <div class="tank tank-rest" id="tank-rest" title="Rest (me time)">
+                                <span class="liquid"></span><span class="tank-icon">🌙</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ----- chips: weather · craving · where Yna is ----- -->
+                    <div class="chips">
+                        <p class="pill chip" id="chip-weather" hidden></p>
+                        <p class="pill chip" id="chip-craving" hidden></p>
+                        <button type="button" class="pill chip chip-btn" id="chip-find" hidden></button>
+                    </div>
+
+                    <!-- ----- the room picture (swipe or use the arrows) ----- -->
+                    <div class="room" id="room">
+                        <img class="room-art" id="room-art" src="assets/yna/rooms/house_outside.webp" alt="">
+
+                        <!-- Theater: the projector shows what Yna is watching -->
+                        <div class="screen-box" id="theater-screen" hidden>
+                            <img class="screen-poster" id="screen-poster" src="" alt="" hidden>
+                            <div class="screen-text">
+                                <p class="screen-small">NOW SHOWING</p>
+                                <p class="screen-title" id="screen-title">Nothing on yet…</p>
+                                <p class="screen-emoji" id="screen-reaction"></p>
+                            </div>
+                        </div>
+
+                        <!-- Music room: the TV shows the song Yna is listening to -->
+                        <div class="screen-box" id="music-tv" hidden>
+                            <img class="tv-art" id="tv-art" src="" alt="" hidden>
+                            <div class="screen-text">
+                                <p class="screen-title" id="tv-title">♪ quiet for now</p>
+                                <p class="screen-small" id="tv-artist"></p>
+                                <span class="bars" id="tv-bars" hidden><i></i><i></i><i></i><i></i></span>
+                            </div>
+                        </div>
+
+                        <!-- bouncing label above the arcade / gachapon / projector / TV -->
+                        <a class="spot-label" id="spot-label" href="#room-info" hidden></a>
+
+                        <!-- Yna (only in the room she's really in) -->
+                        <img class="yna" id="yna" src="" alt="Yna" hidden>
+                        <p class="speech" id="speech" hidden></p>
+                        <p class="float-plus" id="float-plus" hidden></p>
+
+                        <button type="button" class="arrow arrow-left" id="prev-room" aria-label="Previous room">‹</button>
+                        <button type="button" class="arrow arrow-right" id="next-room" aria-label="Next room">›</button>
+                    </div>
+
+                    <!-- ----- dock: care buttons (only in Yna's room) ----- -->
+                    <div class="dock" id="dock-care">
+                        <button type="button" class="round" data-care="pat"><span>🐾</span>Pat</button>
+                        <button type="button" class="round" data-care="listen"><span>💬</span>Listen</button>
+                        <button type="button" class="round" data-care="snack"><span>🍟</span>Snack</button>
+                        <button type="button" class="round" data-care="nap"><span>🌙</span>Nap</button>
+                    </div>
+                    <div class="dock" id="dock-find" hidden>
+                        <button type="button" class="round" id="find-yna"><img src="assets/yna/poses/yna_happy.webp" alt="">Find Yna</button>
+                    </div>
+
+                    <label class="visitor-name">Your name (optional)
+                        <input type="text" id="visitor-name" maxlength="16" placeholder="Someone">
+                    </label>
+
+                    <!-- ----- hallway: all 9 rooms (tap one to go there) ----- -->
+                    <nav class="hallway" id="hallway" aria-label="Rooms">
+                        <button type="button" class="hall" data-room="0"><img src="assets/yna/rooms/house_outside.webp" alt=""><span>Outside</span></button>
+                        <button type="button" class="hall" data-room="1"><img src="assets/yna/rooms/room_kitchen.webp" alt=""><span>Kitchen</span></button>
+                        <button type="button" class="hall" data-room="2"><img src="assets/yna/rooms/room_gacha.webp" alt=""><span>Gacha room</span></button>
+                        <button type="button" class="hall" data-room="3"><img src="assets/yna/rooms/room_playroom.webp" alt=""><span>Playroom</span></button>
+                        <button type="button" class="hall" data-room="4"><img src="assets/yna/rooms/room_theater.webp" alt=""><span>Theater</span></button>
+                        <button type="button" class="hall" data-room="5"><img src="assets/yna/rooms/room_radio.webp" alt=""><span>Music room</span></button>
+                        <button type="button" class="hall" data-room="6"><img src="assets/yna/rooms/room_desk.webp" alt=""><span>Computer desk</span></button>
+                        <button type="button" class="hall" data-room="7"><img src="assets/yna/rooms/room_bedroom.webp" alt=""><span>Bedroom</span></button>
+                        <button type="button" class="hall" data-room="8"><img src="assets/yna/rooms/room_balcony.webp" alt=""><span>Balcony</span></button>
+                    </nav>
+                </section>
+
+
+                <!-- ================= RIGHT: WHAT'S IN THIS ROOM =================
+                     Each box has data-for="ROOM IDs". yna.js shows only the boxes for the room you're looking at. -->
+                <section class="room-info" id="room-info" aria-live="polite">
+
+                    <!-- OUTSIDE: who visited -->
+                    <article class="card" data-for="OUTSIDE">
+                        <h2>💌 Visitor log</h2>
+                        <p class="card-note" id="out-note">Yna's little house. Knock knock!</p>
+                        <ul class="care-log" id="care-log"></ul>
+                        <p class="card-note" id="care-empty">No visitors yet — be the first to pat Yna 🥺</p>
+                    </article>
+
+                    <!-- KITCHEN + GACHA: Yna's craving -->
+                    <article class="card" data-for="KITCHEN GACHA">
+                        <h2>🍽️ Yna's craving</h2>
+                        <p class="craving" id="craving-now">Nothing yet…</p>
+                        <p class="card-note" id="craving-before"></p>
+                        <p class="card-note">Snack makes Yna's tummy happy. Fries are always a yes 🍟</p>
+                    </article>
+
+                    <!-- PLAYROOM: boss scores -->
+                    <article class="card" data-for="PLAYROOM">
+                        <h2>👑 Yna's boss scores</h2>
+                        <table class="boss">
+                            <tbody>
+                                <tr><td>☁️ Cloud Jump</td><td id="boss-cloud_jump">—</td></tr>
+                                <tr><td>🥤 Cola Cart</td><td id="boss-cola_cart">—</td></tr>
+                                <tr><td>🏃 Yna Run</td><td id="boss-runner">—</td></tr>
+                                <tr><td>🔢 Daily Sudoku</td><td id="boss-sudoku">—</td></tr>
+                            </tbody>
+                        </table>
+                        <p class="card-note">These games live in the Yna's House app. While you're here, try Bug Snake!</p>
+                        <a class="btn yna-btn" href="game.html">🐛 Play Bug Snake</a>
+                    </article>
+
+                    <!-- THEATER: watch list with posters -->
+                    <article class="card" data-for="THEATER">
+                        <h2>📺 What Yna is watching</h2>
+                        <div class="shows" id="shows-now"></div>
+                        <h3>Recent watches</h3>
+                        <div class="shows" id="shows-recent"></div>
+                        <h3>All-time favourites</h3>
+                        <div class="shows" id="shows-fav"></div>
+                    </article>
+
+                    <!-- MUSIC ROOM: Spotify (updates by itself) + suggest a song -->
+                    <article class="card" data-for="RADIO">
+                        <h2>🎧 Yna's music</h2>
+                        <div class="now-song">
+                            <img class="now-art" id="now-art" src="" alt="" hidden>
+                            <div>
+                                <p class="now-title" id="now-title">Not playing right now</p>
+                                <p class="card-note" id="now-artist"></p>
+                            </div>
+                        </div>
+                        <h3>Playlists</h3>
+                        <div class="tracks" id="playlists"><p class="card-note">Nothing here yet</p></div>
+                        <h3>Top songs lately</h3>
+                        <div class="tracks" id="top-songs"></div>
+                        <h3>Recently played</h3>
+                        <div class="tracks" id="recent-songs"></div>
+
+                        <form class="suggest" id="suggest-form">
+                            <label for="suggest-song">Suggest a song for Yna 🎵</label>
+                            <div class="suggest-row">
+                                <input type="text" id="suggest-song" maxlength="80" placeholder="Song – Artist" required>
+                                <button type="submit" class="btn yna-btn">Send</button>
+                            </div>
+                            <p class="card-note" id="suggest-note"></p>
+                        </form>
+                    </article>
+
+                    <!-- DESK / BEDROOM / BALCONY: little notes -->
+                    <article class="card" data-for="DESK">
+                        <h2>💻 Computer desk</h2>
+                        <p class="card-note">When Yna's here she's busy coding — eye rolls, typing, the occasional crash. Pat her for moral support!</p>
+                    </article>
+                    <article class="card" data-for="BEDROOM">
+                        <h2>🌙 Bedroom</h2>
+                        <p class="card-note">Shh… when Yna's here she's sleeping. A nap tuck-in still counts 💤</p>
+                    </article>
+                    <article class="card" data-for="BALCONY">
+                        <h2>🌿 Balcony</h2>
+                        <p class="card-note">Yna's chill spot: fresh air, plants and a cold cola 🥤</p>
+                    </article>
+                </section>
+            </div>
+        </main>
+
+
+        <!-- ===== small pieces yna.js copies for lists ===== -->
+
+        <!-- one show (poster + name) -->
+        <template id="tpl-show">
+            <div class="show">
+                <div class="show-poster"><img src="" alt=""><span class="show-kind"></span></div>
+                <p class="show-title"></p>
+                <p class="show-reaction"></p>
+            </div>
+        </template>
+
+        <!-- one song / playlist (opens in Spotify) -->
+        <template id="tpl-track">
+            <a class="track" href="#" target="_blank" rel="noopener">
+                <img class="track-art" src="" alt="">
+                <span class="track-text"><span class="track-title"></span><span class="track-artist"></span></span>
+            </a>
+        </template>
+
+        <!-- one line in the visitor log -->
+        <template id="tpl-care">
+            <li class="care-line"><span class="care-who"></span> <span class="care-what"></span> <span class="care-when"></span></li>
+        </template>
+
+
+        <script src="modules/shared/include.js"></script>
+        <script src="modules/shared/shared.js"></script>
+        <script src="modules/yna/yna-data.js"></script>
+        <script src="modules/yna/yna.js"></script>
+    </body>
+</html>

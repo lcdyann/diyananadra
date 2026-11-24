@@ -195,11 +195,14 @@
             </button>
         </template>
 
-        <!-- ONE SKILL in the tray -->
+        <!-- ONE SKILL in the tray = one gacha ball
+             top half = the machine's colour, the logo is drawn as an outline symbol,
+             the name pops up on hover (laptop) or tap (phone, tabindex lets it get focus) -->
         <template id="skill-template">
-            <li class="skill-chip">
+            <li class="skill-ball" tabindex="0">
+                <span class="ball-shell" aria-hidden="true"></span>
                 <span class="skill-icon" data-fill="icon-box"><i data-fill="icon" aria-hidden="true"></i></span>
-                <span data-fill="name"></span>
+                <span class="skill-name" data-fill="name"></span>
             </li>
         </template>
 

@@ -521,53 +521,129 @@
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
-    gap:10px;
+    gap:22px 16px;
+    padding-top:30px;   /*room for the name bubble above the first row*/
 }
 
-/*one skill: logo + name, spills in when the capsule opens*/
-.skill-chip {
+/*one skill = one gacha ball: machine colour on top, white bottom, logo as an outline symbol.
+  The name is hidden until you hover (laptop) or tap (phone).*/
+.skill-ball {
     --machine:#5EC4CD;
-    display:inline-flex;
+    position:relative;
+    width:66px;
+    height:66px;
+    display:flex;
     align-items:center;
-    gap:8px;
-    padding:4px 14px 4px 4px;
-    font-family:var(--font-pixel);
-    font-size:15px;
-    background:var(--ghost);
-    border:2px solid var(--machine);
-    border-radius:999px;
+    justify-content:center;
+    cursor:pointer;
+    outline:none;
     animation:spill 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    transition:transform 0.2s;
 }
 
-/*rise on hover, no glow (skills are not buttons)*/
-.skill-chip:hover {
-    transform:translateY(-3px);
+/*the ball itself (two halves + shine)*/
+.ball-shell {
+    position:absolute;
+    inset:0;
+    border:3px solid var(--frame-edge);
+    border-radius:50%;
+    background:
+        radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.75) 0 7px, transparent 8px),
+        linear-gradient(var(--machine) 0 50%, #ffffff 50% 100%);
+    box-shadow:inset 0 -5px 0 rgba(0, 0, 0, 0.08), 0 4px 0 var(--frame-edge);
+    transition:transform 0.25s;
+}
+
+/*the line where the two halves meet*/
+.ball-shell::after {
+    content:'';
+    position:absolute;
+    left:-3px;
+    right:-3px;
+    top:calc(50% - 1.5px);
+    height:3px;
+    background:var(--frame-edge);
+}
+
+/*round window in the middle that holds the logo*/
+.skill-icon {
+    position:relative;
+    z-index:1;
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    background:#ffffff;
+    border:2px solid var(--frame-edge);
+    border-radius:50%;
+}
+
+/*the logo as an OUTLINE symbol: no fill, only the edge*/
+.skill-ball .skill-icon i {
+    color:transparent;
+    -webkit-text-stroke:1.2px #300000;
+}
+
+/*no logo: first letters, also outlined*/
+.skill-icon.no-icon {
+    font-size:13px;
+    font-weight:800;
+    color:transparent;
+    -webkit-text-stroke:1px #300000;
+}
+
+/*the name bubble (shown on hover / tap)*/
+.skill-name {
+    position:absolute;
+    left:50%;
+    bottom:calc(100% + 10px);
+    z-index:2;
+    padding:4px 10px;
+    white-space:nowrap;
+    font-family:var(--font-pixel);
+    font-size:14px;
+    color:var(--fg);
+    background:var(--dialog);
+    border:2px solid var(--machine);
+    border-radius:10px;
+    opacity:0;
+    transform:translate(-50%, 6px);
+    pointer-events:none;
+    transition:opacity 0.15s, transform 0.15s;
+}
+
+/*little arrow under the bubble*/
+.skill-name::after {
+    content:'';
+    position:absolute;
+    left:50%;
+    top:100%;
+    border:6px solid transparent;
+    border-top-color:var(--machine);
+    transform:translateX(-50%);
+}
+
+.skill-ball:hover .skill-name,
+.skill-ball:focus .skill-name {
+    opacity:1;
+    transform:translate(-50%, 0);
+}
+
+/*hover / tap: the ball wobbles a little and the logo fills with colour*/
+.skill-ball:hover .ball-shell,
+.skill-ball:focus .ball-shell {
+    transform:rotate(-12deg) scale(1.06);
+}
+
+.skill-ball:hover .skill-icon i,
+.skill-ball:focus .skill-icon i {
+    -webkit-text-stroke-color:var(--machine);
 }
 
 @keyframes spill {
     from { opacity:0; transform:translateY(-20px) scale(0.4); }
     to   { opacity:1; transform:none; }
-}
-
-/*round white spot for the logo*/
-.skill-icon {
-    width:32px;
-    height:32px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:20px;
-    border-radius:50%;
-    background:#ffffff;
-}
-
-/*no logo: first letters on the machine's colour*/
-.skill-icon.no-icon {
-    font-size:11px;
-    font-weight:600;
-    color:#300000;
-    background:var(--machine);
 }
 
 

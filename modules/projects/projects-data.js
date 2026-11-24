@@ -52,6 +52,22 @@ var PROJECTS = [
             { file: 'assets/projects/portfolio/3.png', name: 'Projects' },
             { file: 'assets/projects/portfolio/4.png', name: 'Bug Snake' }
         ]
+    },
+
+    {
+        id: 'ynashouse',
+        name: "Yna's House",
+        type: 'ANDROID APP',
+        preview: 'assets/projects/ynashouse/1.webp',
+        tags: ['Kotlin', 'Jetpack Compose', 'Vercel', 'Redis', 'Spotify API'],
+        link: 'yna.html', /*the live house visitors can walk into*/
+        description: "Meet Danyna, Yna for short: a hangry, cola-loving bear who lives in a round house with nine rooms. The room she is in shows what she is up to right now, and her meters, cravings, shows, music and the weather update live. Visit her house, give her a pat or a snack, and try to beat her boss scores in the mini games!",
+        screenshots: [
+            { file: 'assets/projects/ynashouse/1.webp', name: 'Outside + Theater' },
+            { file: 'assets/projects/ynashouse/2.webp', name: 'Music room + Playroom' },
+            { file: 'assets/projects/ynashouse/3.webp', name: 'Kitchen + Gacha room' },
+            { file: 'assets/projects/ynashouse/4.webp', name: 'Bedroom + Balcony' }
+        ]
     }
 
     /* ----- next project goes here (don't forget the comma after the } above) ----- */
